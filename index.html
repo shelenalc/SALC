@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#010204" />
-  <meta name="description" content="SHELEN v13 — Precision Over Noise. MT5 Bridge Edition." />
+  <meta name="theme-color" content="#0A0E17" />
+  <meta name="description" content="SALC Expert Advisor Terminal v14 — Institutional Intelligence, Zero Latency. by Nizar Nurkhalik" />
+  <meta name="keywords" content="trading, forex, gold, XAUUSD, ICT, SMC, Alchemist, signal, MT5, expert advisor" />
 
-  <title>SHELEN v13 — Precision Over Noise</title>
+  <title>SALC — Expert Advisor Terminal v14</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&family=Syne:wght@700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
@@ -26,31 +27,61 @@
 <div id="app">
 
   <!-- =================================================================
-       TOPBAR
+       TOPBAR — Zero-Delay Live Price Bar
   ================================================================== -->
   <header class="topbar" role="banner">
 
-    <!-- Logo -->
-    <div class="tb-logo" aria-label="SHELEN Terminal">
-      <span class="tb-logo-she">SHE</span><span class="tb-logo-len">LEN</span>
-      <span class="tb-version-badge">v13</span>
-    </div>
-
-    <!-- MT5 Bridge Status Pill -->
-    <button class="tb-mt5-pill" id="tbMT5Pill" onclick="openMT5Modal()" aria-label="MT5 Bridge Status">
-      <span class="tb-mt5-dot" id="tbMT5Dot"></span>
-      <span class="tb-mt5-label" id="tbMT5Label">MT5</span>
+    <!-- Hamburger Menu Button -->
+    <button class="hbg-btn" id="hbgBtn" onclick="toggleDrawer()" aria-label="Open menu" aria-expanded="false">
+      <span class="hbg-line"></span>
+      <span class="hbg-line"></span>
+      <span class="hbg-line"></span>
     </button>
 
-    <!-- Live Price Strip -->
-    <div class="tb-price-strip" id="tbPriceStrip" role="marquee" aria-live="polite">
-      <!-- Dynamically populated by script.js -->
+    <!-- Logo -->
+    <div class="tb-logo" aria-label="SALC Expert Advisor Terminal">
+      <svg class="tb-logo-eye" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="eg2" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stop-color="#F5C842"/>
+            <stop offset="60%" stop-color="#E8B831"/>
+            <stop offset="100%" stop-color="#C8902A"/>
+          </radialGradient>
+          <radialGradient id="ir2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1a0a00"/>
+            <stop offset="100%" stop-color="#0a0500"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="16" cy="16" rx="14" ry="9" fill="none" stroke="url(#eg2)" stroke-width="1.5"/>
+        <ellipse cx="16" cy="16" rx="14" ry="9" fill="url(#eg2)" opacity=".08"/>
+        <path d="M2,16 Q8,9 16,10 Q24,11 30,16 Q24,23 16,22 Q8,21 2,16Z" fill="url(#eg2)" opacity=".18"/>
+        <circle cx="16" cy="16" r="6.5" fill="url(#ir2)" stroke="url(#eg2)" stroke-width="1.2"/>
+        <circle cx="16" cy="16" r="4" fill="url(#eg2)" opacity=".9"/>
+        <circle cx="16" cy="16" r="2.2" fill="#0a0500"/>
+        <ellipse cx="14.5" cy="14.8" rx="1.2" ry=".8" fill="#fff" opacity=".7" transform="rotate(-30,14.5,14.8)"/>
+        <line x1="2" y1="16" x2="30" y2="16" stroke="url(#eg2)" stroke-width=".4" opacity=".3"/>
+      </svg>
+      <div class="tb-logo-text">
+        <span class="tb-logo-sa">SA</span><span class="tb-logo-lc">LC</span>
+        <span class="tb-version-badge">v14</span>
+      </div>
     </div>
+
+    <!-- Live Price Strip — ZERO DELAY, updates on every tick -->
+    <div class="tb-price-strip" id="tbPriceStrip" role="marquee" aria-live="polite" aria-label="Live prices">
+      <!-- Populated by pricebar engine in script.js -->
+    </div>
+
+    <!-- WSS Status Pill -->
+    <button class="tb-wss-pill off" id="tbWSSPill" onclick="openBridgeModal()" aria-label="Data feed status">
+      <span class="wss-dot" id="tbWSSdot"></span>
+      <span class="wss-label" id="tbWSSLabel">NO FEED</span>
+    </button>
 
     <!-- UTC Clock -->
     <div class="tb-clock" id="tbClock" aria-live="polite">
       <span class="tb-clock-time" id="tbClockTime">--:--:--</span>
-      <span class="tb-clock-date" id="tbClockDate">UTC</span>
+      <span class="tb-clock-date">UTC</span>
     </div>
 
     <!-- User / Login Button -->
@@ -64,19 +95,20 @@
   <!-- =================================================================
        FLASH NEWS MARQUEE BAR
   ================================================================== -->
-  <div class="flash-news-bar" id="flashNewsBar" role="marquee" aria-label="Market news">
+  <div class="flash-news-bar" id="flashNewsBar" role="marquee" aria-label="Breaking market news">
+    <div class="flash-news-label">LIVE</div>
     <div class="flash-news-track" id="flashNewsTrack">
-      <!-- Dynamically populated by script.js -->
+      <!-- Populated by script.js -->
     </div>
   </div>
 
 
   <!-- =================================================================
-       LIVE PRICE TICKER (shown only on Terminal + News pages)
+       LIVE PRICE TICKER (Terminal + News pages only)
   ================================================================== -->
   <div class="ticker-bar" id="tickerBar" hidden>
     <div class="ticker-inner" id="tickerInner">
-      <!-- Dynamically populated by script.js -->
+      <!-- Populated by script.js -->
     </div>
   </div>
 
@@ -95,21 +127,24 @@
       <!-- Hero Block -->
       <div class="hero-wrap">
         <div class="hero-grid" aria-hidden="true"></div>
-
         <div class="hero-content">
 
-          <!-- Eyebrow Label -->
-          <p class="hero-eyebrow">SHELEN TRADING TERMINAL · MT5 BRIDGE EDITION</p>
+          <!-- Eyebrow -->
+          <p class="hero-eyebrow">
+            <span class="hero-eyebrow-dot" aria-hidden="true"></span>
+            SALC EXPERT ADVISOR TERMINAL · DUAL-ENGINE ZERO-LATENCY
+          </p>
 
           <!-- H1 -->
           <h1 class="hero-h1">
-            PRE<span class="hero-stroke">CI</span><br>SION.
+            EX<span class="hero-stroke">PERT</span><br>
+            <span class="hero-h1-sub">ADVISOR.</span>
           </h1>
 
           <!-- Tagline -->
           <p class="hero-tagline">
-            Terminal AI sinyal trading terpresisi.<br>
-            <strong>ICT · SMC · Alchemist</strong> — langsung dari akun MT5 kamu.
+            Institutional Intelligence, Zero Latency.<br>
+            <strong>Alchemist · ICT AMD · MSNR OCL</strong> — langsung dari feed live.
           </p>
 
           <!-- Owner Badge -->
@@ -117,78 +152,290 @@
             <div class="owner-avatar" aria-hidden="true">NN</div>
             <div class="owner-info">
               <span class="owner-name">Nizar Nurkhalik</span>
-              <span class="owner-handle">@shelentrading · Founder &amp; Lead Dev</span>
+              <span class="owner-handle">@svenjunee · @svenjuneee · Founder SALC</span>
             </div>
-            <span class="owner-plan-pill">FOUNDER</span>
+            <span class="owner-plan-pill founder">👑 FOUNDER</span>
           </div>
 
-          <!-- CTA Buttons -->
+          <!-- CTA Row -->
           <div class="hero-cta-row">
             <button class="btn btn-gold hero-cta-primary" onclick="openAuth()">
-              ⚡ MULAI TRADING
+              ⚡ MULAI TRADING SEKARANG
             </button>
-            <button class="btn btn-ghost hero-cta-secondary" onclick="openTosModal()">
-              T&amp;C
+            <button class="btn btn-ghost hero-cta-secondary" onclick="requireAuth('terminal')">
+              BUKA TERMINAL LIVE →
             </button>
           </div>
 
         </div><!-- /.hero-content -->
+
+        <!-- AMG GT / Sports Car SVG Illustration -->
+        <div class="hero-car-wrap" aria-hidden="true">
+          <svg class="hero-car" viewBox="0 0 780 330" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="carBody" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#181818"/>
+                <stop offset="45%" stop-color="#0c0c0c"/>
+                <stop offset="100%" stop-color="#050505"/>
+              </linearGradient>
+              <linearGradient id="windshield" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#101d28" stop-opacity=".9"/>
+                <stop offset="100%" stop-color="#060e15" stop-opacity=".75"/>
+              </linearGradient>
+              <linearGradient id="rimGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#444"/>
+                <stop offset="100%" stop-color="#111"/>
+              </linearGradient>
+              <filter id="shadowF" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(232,184,49,.12)"/>
+              </filter>
+            </defs>
+
+            <!-- Ground shadow -->
+            <ellipse cx="390" cy="300" rx="310" ry="14" fill="rgba(0,0,0,.45)"/>
+
+            <!-- CAR BODY -->
+            <path d="M68,258 L54,230 L57,207
+                     Q87,138 168,126 L260,118
+                     Q320,84 392,74 L502,70
+                     Q572,72 620,87
+                     Q666,100 694,118 L722,140 L740,170 L744,220
+                     L740,244 L734,258 Z"
+                  fill="url(#carBody)" stroke="#1c1c1c" stroke-width="1.2" filter="url(#shadowF)"/>
+
+            <!-- WINDSHIELD / GLASS -->
+            <path d="M220,120 L272,86 Q348,64 418,60 L502,60
+                     Q568,62 618,76 L664,101
+                     Q690,116 700,136 L582,130
+                     Q547,123 512,118 L387,114 Z"
+                  fill="url(#windshield)"/>
+
+            <!-- Inner glass tint -->
+            <path d="M274,86 Q348,64 418,60 L502,60
+                     Q568,62 618,76 L664,101
+                     Q626,98 590,96 L510,94
+                     Q450,92 406,94 L338,98 Z"
+                  fill="#0a1822" opacity=".86"/>
+
+            <!-- BODY ACCENT LINE -->
+            <path d="M70,190 Q182,170 287,165 L507,162
+                     Q592,162 650,172 L698,190"
+                  stroke="#2a2a2a" stroke-width="1.8" fill="none"/>
+
+            <!-- GOLD STRIPE -->
+            <path d="M110,255 L720,255" stroke="#E8B831" stroke-width=".8" opacity=".25"/>
+
+            <!-- BOTTOM SKIRT -->
+            <path d="M75,258 L734,258 L742,265 L68,265 Z"
+                  fill="#0d0d0d" stroke="#1a1a1a" stroke-width=".8"/>
+
+            <!-- FRONT HEADLIGHT ASSEMBLY -->
+            <path d="M664,126 Q686,122 714,131 L724,143
+                     Q722,163 712,170
+                     Q690,173 672,167
+                     Q657,160 655,145 Z"
+                  fill="#0a0a0a" stroke="#222" stroke-width="1"/>
+            <!-- Headlight beam -->
+            <path d="M668,131 L716,139" stroke="#e0f0ff" stroke-width="2.2" stroke-linecap="round" opacity=".92"/>
+            <path d="M669,138 Q689,136 710,141 L712,148
+                     Q692,151 672,148 Z"
+                  fill="#fff" opacity=".28"/>
+            <!-- DRL strip -->
+            <path d="M665,128 Q680,124 700,126 L706,130 Q690,132 668,131 Z"
+                  fill="#E8B831" opacity=".55"/>
+
+            <!-- FRONT GRILLE / SPLITTER -->
+            <path d="M682,183 Q694,177 718,180 L724,192
+                     Q722,207 716,212
+                     Q697,215 684,209 L681,197 Z"
+                  fill="#060606" stroke="#E8B831" stroke-width="1.5"/>
+            <!-- Grille slats -->
+            <g stroke="#1a1a1a" stroke-width=".8">
+              <line x1="686" y1="180" x2="683" y2="212"/>
+              <line x1="692" y1="179" x2="689" y2="213"/>
+              <line x1="698" y1="179" x2="695" y2="213"/>
+              <line x1="704" y1="179" x2="701" y2="213"/>
+              <line x1="710" y1="180" x2="707" y2="212"/>
+            </g>
+            <!-- AMG badge -->
+            <rect x="696" y="222" width="26" height="10" rx="2" fill="#0d0d0d" stroke="#2a2a2a" stroke-width=".7"/>
+            <text x="709" y="230" font-family="Arial" font-size="6.5" font-weight="bold" fill="#E8B831" text-anchor="middle">AMG</text>
+
+            <!-- REAR TAILLIGHT -->
+            <path d="M60,200 L79,202 L81,238 L64,240 Z"
+                  fill="#0a0404" stroke="#280808" stroke-width="1"/>
+            <rect x="63" y="207" width="14" height="4" rx="1.5" fill="#e8334a" opacity=".85"/>
+            <rect x="63" y="216" width="14" height="4" rx="1.5" fill="#b80d0d" opacity=".55"/>
+            <rect x="63" y="225" width="14" height="4" rx="1.5" fill="#e8334a" opacity=".3"/>
+            <path d="M59,200 L59,238" stroke="#e8334a" stroke-width="2" opacity=".6"/>
+
+            <!-- REAR DIFFUSER -->
+            <path d="M64,255 L85,255 L88,265 L61,265 Z" fill="#0d0d0d"/>
+            <g stroke="#1a1a1a" stroke-width=".5">
+              <line x1="68" y1="255" x2="70" y2="265"/>
+              <line x1="73" y1="255" x2="75" y2="265"/>
+              <line x1="78" y1="255" x2="80" y2="265"/>
+              <line x1="83" y1="255" x2="85" y2="265"/>
+            </g>
+
+            <!-- GT BADGE -->
+            <text x="134" y="248" font-family="Arial" font-size="8" font-weight="bold" fill="#E8B831">GT</text>
+
+            <!-- EXHAUST TIPS -->
+            <ellipse cx="72" cy="258" rx="5" ry="3" fill="#111" stroke="#333" stroke-width=".7"/>
+            <ellipse cx="83" cy="258" rx="5" ry="3" fill="#111" stroke="#333" stroke-width=".7"/>
+
+            <!-- REAR WHEEL -->
+            <circle cx="624" cy="274" r="52" fill="#080808" stroke="#1c1c1c" stroke-width="1.5"/>
+            <circle cx="624" cy="274" r="41" fill="#0d0d0d" stroke="#232323" stroke-width=".8"/>
+            <circle cx="624" cy="274" r="30" fill="url(#rimGrad)" stroke="#353535" stroke-width=".8"/>
+            <!-- Spokes -->
+            <g stroke="#4a4a4a" stroke-width="2.2">
+              <line x1="624" y1="244" x2="624" y2="263"/>
+              <line x1="624" y1="285" x2="624" y2="304"/>
+              <line x1="594" y1="274" x2="613" y2="274"/>
+              <line x1="635" y1="274" x2="654" y2="274"/>
+              <line x1="603" y1="253" x2="616" y2="266"/>
+              <line x1="632" y1="282" x2="645" y2="295"/>
+              <line x1="645" y1="253" x2="632" y2="266"/>
+              <line x1="616" y1="282" x2="603" y2="295"/>
+            </g>
+            <circle cx="624" cy="274" r="9" fill="#181818" stroke="#333" stroke-width="1"/>
+            <circle cx="624" cy="274" r="5.5" fill="none" stroke="#E8B831" stroke-width=".9"/>
+            <!-- Brake caliper glow -->
+            <path d="M602,243 Q612,234 626,236 L627,242 Q615,240 605,248 Z"
+                  fill="#E8B831" opacity=".7"/>
+
+            <!-- FRONT WHEEL -->
+            <circle cx="214" cy="274" r="52" fill="#080808" stroke="#1c1c1c" stroke-width="1.5"/>
+            <circle cx="214" cy="274" r="41" fill="#0d0d0d" stroke="#232323" stroke-width=".8"/>
+            <circle cx="214" cy="274" r="30" fill="url(#rimGrad)" stroke="#353535" stroke-width=".8"/>
+            <!-- Spokes -->
+            <g stroke="#4a4a4a" stroke-width="2.2">
+              <line x1="214" y1="244" x2="214" y2="263"/>
+              <line x1="214" y1="285" x2="214" y2="304"/>
+              <line x1="184" y1="274" x2="203" y2="274"/>
+              <line x1="225" y1="274" x2="244" y2="274"/>
+              <line x1="193" y1="253" x2="206" y2="266"/>
+              <line x1="222" y1="282" x2="235" y2="295"/>
+              <line x1="235" y1="253" x2="222" y2="266"/>
+              <line x1="206" y1="282" x2="193" y2="295"/>
+            </g>
+            <circle cx="214" cy="274" r="9" fill="#181818" stroke="#333" stroke-width="1"/>
+            <circle cx="214" cy="274" r="5.5" fill="none" stroke="#E8B831" stroke-width=".9"/>
+            <path d="M192,243 Q202,234 216,236 L217,242 Q205,240 195,248 Z"
+                  fill="#E8B831" opacity=".7"/>
+
+            <!-- SUSPENSION / AXLE LINE -->
+            <line x1="214" y1="274" x2="624" y2="274" stroke="#1a1a1a" stroke-width=".5" stroke-dasharray="4,4"/>
+
+            <!-- SPOILER (rear) -->
+            <path d="M62,196 L78,194 L76,200 L60,202 Z"
+                  fill="#1a1a1a" stroke="#2a2a2a" stroke-width=".6"/>
+
+            <!-- ROOF SCOOP -->
+            <path d="M390,72 Q420,62 450,62 L452,68 Q422,68 392,78 Z"
+                  fill="#141414" stroke="#222" stroke-width=".5"/>
+
+            <!-- GOLD ACCENT on hood -->
+            <path d="M530,78 Q560,72 590,74 L590,80 Q560,78 530,84 Z"
+                  fill="none" stroke="#E8B831" stroke-width="1" opacity=".4"/>
+          </svg>
+
+          <!-- Ground glow under car -->
+          <div class="hero-car-glow" aria-hidden="true"></div>
+        </div>
+
       </div><!-- /.hero-wrap -->
 
-      <!-- MT5 Quick-Connect Card -->
-      <div class="home-mt5-card card" id="homeMT5Card">
+      <!-- Quick-Connect Bridge Card (home page) -->
+      <div class="home-bridge-card card" id="homeBridgeCard">
         <div class="ch">
-          <span class="ct">MT5 BRIDGE</span>
-          <span class="cs" id="homeMT5Status">TIDAK TERHUBUNG</span>
+          <span class="ct">⚡ LIVE DATA FEED</span>
+          <span class="cs" id="homeFeedStatus">NO FEED</span>
         </div>
-        <div class="home-mt5-body">
-          <div class="home-mt5-row">
+        <div class="home-bridge-body">
+          <div class="home-bridge-row">
             <input
               type="text"
               class="field field-sm"
-              id="homeMT5UrlInput"
-              placeholder="ws://localhost:8080"
+              id="homeBridgeInput"
+              placeholder="ws://localhost:8080 — MT5 Bridge (kosongkan = Binance + TwelveData)"
               autocomplete="off"
               spellcheck="false"
               inputmode="url"
             />
-            <button class="btn btn-green btn-sm" onclick="MT5Bridge.connectFromHome()">
-              CONNECT
-            </button>
+            <button class="btn btn-gold btn-sm" onclick="connectFromHome()">CONNECT</button>
           </div>
-          <p class="home-mt5-hint">
-            Pasang EA "Shelen Bridge" di MT5 → masukkan URL bridge → CONNECT
+          <p class="home-bridge-hint">
+            <strong>Logic A:</strong> MT5 Bridge URL &nbsp;|&nbsp;
+            <strong>Logic B:</strong> Kosongkan → Binance WSS (crypto gratis) + TwelveData (forex/gold) —
+            <span style="color:var(--green);">ZERO DELAY GUARANTEED</span>
           </p>
         </div>
-      </div><!-- /.home-mt5-card -->
+      </div>
 
       <!-- Stats Grid -->
       <div class="home-stats-grid" role="list">
         <div class="hsc hsc-green" role="listitem">
-          <div class="hsc-value" id="hsSigCount">3,124</div>
+          <div class="hsc-value" id="hsSigCount">3,248</div>
           <div class="hsc-label">AI SIGNALS FIRED</div>
         </div>
         <div class="hsc hsc-gold" role="listitem">
-          <div class="hsc-value">87%</div>
-          <div class="hsc-label">AVG WINRATE</div>
+          <div class="hsc-value">74.2%</div>
+          <div class="hsc-label">AVG WIN RATE 30D</div>
         </div>
         <div class="hsc hsc-cyan" role="listitem">
           <div class="hsc-value">1:5</div>
           <div class="hsc-label">MIN R:R RATIO</div>
         </div>
         <div class="hsc hsc-purple" role="listitem">
-          <div class="hsc-value">3</div>
-          <div class="hsc-label">ACTIVE TIERS</div>
+          <div class="hsc-value">12</div>
+          <div class="hsc-label">INSTRUMENTS LIVE</div>
         </div>
-      </div><!-- /.home-stats-grid -->
+      </div>
+
+      <!-- Feature Cards Grid -->
+      <div class="feat-grid">
+        <button class="feat-card" onclick="requireAuth('terminal')" aria-label="AI Signal Engine">
+          <span class="feat-ico" aria-hidden="true">⚡</span>
+          <span class="feat-title">AI Signal Engine</span>
+          <span class="feat-desc">Alchemist v9 · ICT AMD · MSNR — Limit Order confluence realtime</span>
+        </button>
+        <button class="feat-card" onclick="openBridgeModal()" aria-label="Zero-Delay Feed">
+          <span class="feat-ico" aria-hidden="true">📡</span>
+          <span class="feat-title">Zero-Delay Feed</span>
+          <span class="feat-desc">Binance WSS + TwelveData WSS + MT5 Bridge — no delay guaranteed</span>
+        </button>
+        <button class="feat-card" onclick="requireAuth('terminal')" aria-label="AI Photo Analysis">
+          <span class="feat-ico" aria-hidden="true">📸</span>
+          <span class="feat-title">AI Photo Analysis</span>
+          <span class="feat-desc">Upload chart → Claude AI baca pattern, entry zone, SL/TP + konfirmasi</span>
+        </button>
+        <button class="feat-card" onclick="requireAuth('news')" aria-label="Bloomberg News">
+          <span class="feat-ico" aria-hidden="true">📰</span>
+          <span class="feat-title">Bloomberg News</span>
+          <span class="feat-desc">High-impact events, calendar, AI daily bias + sentiment meter</span>
+        </button>
+        <button class="feat-card" onclick="requireAuth('journal')" aria-label="Smart Journal">
+          <span class="feat-ico" aria-hidden="true">📓</span>
+          <span class="feat-title">Smart Journal</span>
+          <span class="feat-desc">Equity curve, winrate ring, P&amp;L heatmap, partial close manager</span>
+        </button>
+        <button class="feat-card" onclick="requireAuth('chat')" aria-label="Community">
+          <span class="feat-ico" aria-hidden="true">💬</span>
+          <span class="feat-title">Community</span>
+          <span class="feat-desc">Hall of Fame, live chat, voice notes, chart sharing — real traders</span>
+        </button>
+      </div>
 
       <!-- Ambient Music Player -->
       <div class="music-player card" id="musicPlayer">
         <div class="music-header">
           <span class="music-ico" aria-hidden="true">🎵</span>
           <div class="music-meta">
-            <span class="music-title" id="musicTitle">Lo-Fi Trading Session</span>
-            <span class="music-sub">SHELEN AMBIENCE ENGINE</span>
+            <span class="music-title" id="musicTitle">Alan Walker — Faded</span>
+            <span class="music-sub">SALC AMBIENT ENGINE · NCS MIX</span>
           </div>
         </div>
         <div class="music-controls">
@@ -200,181 +447,256 @@
             type="range"
             class="music-vol"
             id="volSlider"
-            min="0" max="100" value="60"
+            min="0" max="100" value="65"
             oninput="setVol(this.value)"
             aria-label="Volume"
           />
         </div>
         <div class="track-list" id="trackList" role="list">
-          <!-- Dynamically populated by script.js -->
+          <!-- Populated by script.js -->
         </div>
-      </div><!-- /.music-player -->
-
-      <!-- Feature Pills Grid -->
-      <div class="feat-grid">
-        <button class="feat-card" onclick="goPage('terminal')" aria-label="AI Signal Engine">
-          <span class="feat-ico" aria-hidden="true">⚡</span>
-          <span class="feat-title">AI Signal</span>
-          <span class="feat-desc">ICT + SMC + Alchemist confluence realtime</span>
-        </button>
-        <button class="feat-card" onclick="openMT5Modal()" aria-label="MT5 Bridge">
-          <span class="feat-ico" aria-hidden="true">🔌</span>
-          <span class="feat-title">MT5 Bridge</span>
-          <span class="feat-desc">Harga live langsung dari akun MT5 kamu</span>
-        </button>
-        <button class="feat-card" onclick="goPage('news')" aria-label="Financial News">
-          <span class="feat-ico" aria-hidden="true">📰</span>
-          <span class="feat-title">Eco News</span>
-          <span class="feat-desc">High-impact events &amp; AI sentiment bias</span>
-        </button>
-        <button class="feat-card" onclick="goPage('journal')" aria-label="Trade Journal">
-          <span class="feat-ico" aria-hidden="true">📓</span>
-          <span class="feat-title">Journal</span>
-          <span class="feat-desc">Equity curve, winrate ring, P&amp;L tracker</span>
-        </button>
-      </div><!-- /.feat-grid -->
+      </div>
 
       <!-- Broker Partner Section -->
       <section class="broker-section" aria-label="Broker Partners">
         <div class="section-divider">
-          <span class="section-divider-label">BROKER PARTNER</span>
+          <span class="section-divider-label">BROKER PARTNER SALC</span>
         </div>
         <div class="broker-card card">
           <p class="broker-headline">🎁 DAFTAR VIA BROKER PARTNER → DAPAT PREMIUM GRATIS SEUMUR HIDUP</p>
           <p class="broker-desc">
-            Daftar di salah satu broker di bawah via link Nizar → deposit → kirim nomor akun ke Admin WA untuk aktivasi PREMIUM seumur hidup.
+            Daftar di salah satu broker di bawah via link Nizar → deposit → kirim nomor akun ke Admin WA
+            → aktivasi PREMIUM seumur hidup GRATIS.
           </p>
           <div class="broker-btn-col">
-            <a
-              href="https://www.hfmtrade-ind.com/sv/en/?refid=30517682"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-gold2"
-            >🏦 HFM — Cocok Buat Modal Kecil →</a>
-            <a
-              href="https://one.exnessonelink.com/a/4qa0vqh2p9?source=app&platform=mobile&pid=mobile_share"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-cyan"
-            >⚡ EXNESS — Terbaik Instant Withdraw →</a>
-            <a
-              href="https://wa.me/6285839053130?text=Halo+Admin+SHELEN%2C+saya+sudah+daftar+dan+deposit+via+broker+partner.+Nomor+akun+saya%3A+"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-green"
-            >💬 Kirim Nomor Akun ke Admin WA →</a>
+            <a href="https://www.hfmtrade-ind.com/sv/en/?refid=30517682"
+               target="_blank" rel="noopener noreferrer" class="btn btn-gold2">
+              🏦 HFM — Cocok Modal Kecil →
+            </a>
+            <a href="https://one.exnessonelink.com/a/4qa0vqh2p9?source=app&platform=mobile&pid=mobile_share"
+               target="_blank" rel="noopener noreferrer" class="btn btn-cyan">
+              ⚡ EXNESS — Terbaik Instant Withdraw →
+            </a>
+            <a href="https://wa.me/6285839053130?text=Halo+Admin+SALC%2C+saya+sudah+daftar+via+broker+partner.+Nomor+akun%3A+"
+               target="_blank" rel="noopener noreferrer" class="btn btn-green">
+              💬 Kirim Nomor Akun ke Admin WA →
+            </a>
           </div>
         </div>
-      </section><!-- /.broker-section -->
+      </section>
+
+      <!-- Footer note -->
+      <div class="home-footer-note">
+        <p>© 2026 SALC Expert Advisor Terminal v14.0 · by Nizar Nurkhalik</p>
+        <p>IG: <strong>@svenjunee</strong> · TikTok: <strong>@svenjuneee</strong> · WA: <strong>085839053130</strong></p>
+        <p class="risk-disclaimer">Trading melibatkan risiko kerugian substansial. Semua sinyal bersifat informatif — bukan saran investasi. Gunakan money management yang ketat.</p>
+      </div>
 
       <div class="page-bottom-spacer"></div>
-
-      <!-- Hidden Audio Element -->
       <audio id="bgAudio" preload="none" aria-hidden="true"></audio>
 
     </section><!-- /#pg-home -->
 
 
     <!-- ===============================================================
-         PAGE: TERMINAL (SIGNAL ENGINE)
+         PAGE: TERMINAL (EXPERT ADVISOR ENGINE)
     ================================================================ -->
-    <section class="page" id="pg-terminal" role="main" aria-label="Trading Terminal" hidden>
+    <section class="page" id="pg-terminal" role="main" aria-label="Expert Advisor Terminal" hidden>
 
       <!-- Lock Overlay -->
       <div class="lock" id="lock-terminal" role="alertdialog" aria-label="Access locked">
         <span class="lock-ico" aria-hidden="true">🔒</span>
         <h2 class="lock-title">AKSES TERKUNCI</h2>
-        <p class="lock-desc">Login untuk mengakses<br>Terminal Trading Realtime</p>
+        <p class="lock-desc">Login untuk mengakses<br>Expert Advisor Terminal Realtime</p>
         <button class="btn btn-gold" onclick="openAuth()">LOGIN / DAFTAR</button>
       </div>
 
-      <!-- Terminal Content (shown after login) -->
+      <!-- Terminal Content -->
       <div class="terminal-content" id="tc-content" hidden>
 
-        <!-- ── MT5 BRIDGE STATUS PANEL ── -->
-        <div class="mt5-bridge-panel card" id="mt5BridgePanel">
+        <!-- ── FOUNDER GODMODE BAR ── -->
+        <div class="founder-bar" id="founderBar" hidden>
+          <span class="founder-ico" aria-hidden="true">👑</span>
+          <div class="founder-text">
+            <span class="founder-name">NIZAR NURKHALIK</span>
+            <span class="founder-sub">FOUNDER MODE — ALL FEATURES UNLOCKED · GODMODE ACTIVE</span>
+          </div>
+          <span class="founder-pill">GODMODE</span>
+        </div>
+
+        <!-- ── DUAL-ENGINE DATA FEED PANEL ── -->
+        <div class="bridge-panel card" id="bridgePanel">
           <div class="ch">
-            <span class="ct">MT5 BRIDGE</span>
-            <div class="mt5-status-row">
-              <span class="mt5-status-dot" id="mt5StatusDot" data-state="disconnected"></span>
-              <span class="mt5-status-text" id="mt5StatusText">TIDAK TERHUBUNG</span>
+            <span class="ct">⚡ DUAL-ENGINE ZERO-LATENCY FEED</span>
+            <div class="bridge-status-row">
+              <span class="bridge-status-dot" id="bridgeDot" data-state="off"></span>
+              <span class="bridge-status-text" id="bridgeText">NO FEED</span>
             </div>
           </div>
-          <!-- Account State Grid -->
+          <!-- URL Input Row -->
+          <div class="bridge-input-row">
+            <input
+              type="text"
+              class="field field-sm"
+              id="bridgeUrlInput"
+              placeholder="ws://localhost:8080 — MT5 Bridge (kosongkan = Binance + TwelveData)"
+              autocomplete="off"
+              spellcheck="false"
+              inputmode="url"
+            />
+            <button class="btn btn-gold btn-sm" id="bridgeConnBtn" onclick="connectDualEngine()">CONNECT</button>
+            <button class="btn btn-red btn-sm bridge-disc-btn" id="bridgeDiscBtn" onclick="disconnectEngine()" hidden>✕ CUT</button>
+          </div>
+          <p class="bridge-hint">
+            <strong>Logic A:</strong> MT5 Bridge (isi URL) &nbsp;|&nbsp;
+            <strong>Logic B1:</strong> Binance WSS — BTC/ETH gratis no-key &nbsp;|&nbsp;
+            <strong>Logic B2:</strong> TwelveData — XAUUSD + Forex &nbsp;|&nbsp;
+            <strong>Logic D:</strong> Simulation fallback
+          </p>
+          <!-- Engine Stats -->
+          <div class="bridge-stats-row">
+            <div class="bridge-stat">
+              <span class="bridge-stat-l">ENGINE MODE</span>
+              <span class="bridge-stat-v gold" id="bridgeMode">—</span>
+            </div>
+            <div class="bridge-stat">
+              <span class="bridge-stat-l">TICKS/MIN</span>
+              <span class="bridge-stat-v green" id="bridgeTpm">0</span>
+            </div>
+            <div class="bridge-stat">
+              <span class="bridge-stat-l">LATENCY</span>
+              <span class="bridge-stat-v" id="bridgeLat">—</span>
+            </div>
+            <div class="bridge-stat">
+              <span class="bridge-stat-l">UPTIME</span>
+              <span class="bridge-stat-v cyan" id="bridgeUptime">—</span>
+            </div>
+          </div>
+        </div><!-- /.bridge-panel -->
+
+        <!-- ── LIVE PRICE HERO ── -->
+        <div class="price-hero card" id="priceHero">
+          <div class="ph-top">
+            <div class="ph-sym-row">
+              <span class="ph-sym" id="phSym">XAUUSD</span>
+              <span class="ph-sub" id="phSub">Gold · OANDA</span>
+            </div>
+            <div class="ph-engine-row">
+              <span class="ph-eng-dot live" id="phEngDot"></span>
+              <span class="ph-eng-txt" id="phEngTxt">NO FEED</span>
+            </div>
+          </div>
+          <div class="ph-price-row">
+            <div class="ph-bid" id="phBid" aria-live="polite">—</div>
+            <div class="ph-ask-spd">
+              <div class="ph-ask" id="phAsk">ASK: —</div>
+              <div class="ph-spd" id="phSpread">SPD —</div>
+            </div>
+          </div>
+          <div class="ph-stats-row">
+            <div class="ph-stat">
+              <span class="ph-stat-l">NET P&amp;L</span>
+              <span class="ph-stat-v green" id="mc-pnl">+$0</span>
+            </div>
+            <div class="ph-stat">
+              <span class="ph-stat-l">WINRATE</span>
+              <span class="ph-stat-v gold" id="mc-wr">0%</span>
+            </div>
+            <div class="ph-stat">
+              <span class="ph-stat-l">SIGNALS</span>
+              <span class="ph-stat-v cyan" id="mc-sig">0</span>
+            </div>
+            <div class="ph-stat">
+              <span class="ph-stat-l">MAX DD</span>
+              <span class="ph-stat-v red" id="mc-dd">0%</span>
+            </div>
+          </div>
+        </div><!-- /.price-hero -->
+
+        <!-- ── MT5 ACCOUNT PANEL ── -->
+        <div class="mt5-acc-panel card" id="mt5AccPanel">
+          <div class="ch">
+            <span class="ct">AKUN MT5 LIVE</span>
+            <span class="cs" id="mt5AccName">—</span>
+          </div>
           <div class="mt5-account-grid" id="mt5AccountGrid">
             <div class="mt5-acc-cell">
               <span class="mt5-acc-label">BALANCE</span>
-              <span class="mt5-acc-value" id="mt5Balance">—</span>
+              <span class="mt5-acc-value gold" id="mt5Balance">—</span>
             </div>
             <div class="mt5-acc-cell">
               <span class="mt5-acc-label">EQUITY</span>
               <span class="mt5-acc-value" id="mt5Equity">—</span>
             </div>
             <div class="mt5-acc-cell">
-              <span class="mt5-acc-label">MARGIN</span>
+              <span class="mt5-acc-label">MARGIN USED</span>
               <span class="mt5-acc-value" id="mt5Margin">—</span>
             </div>
             <div class="mt5-acc-cell">
               <span class="mt5-acc-label">FREE MARGIN</span>
-              <span class="mt5-acc-value mt5-acc-value--positive" id="mt5FreeMargin">—</span>
+              <span class="mt5-acc-value green" id="mt5FreeMargin">—</span>
             </div>
             <div class="mt5-acc-cell">
               <span class="mt5-acc-label">DRAWDOWN</span>
-              <span class="mt5-acc-value mt5-acc-value--danger" id="mt5Drawdown">—</span>
+              <span class="mt5-acc-value red" id="mt5Drawdown">—</span>
             </div>
             <div class="mt5-acc-cell">
-              <span class="mt5-acc-label">PROFIT</span>
+              <span class="mt5-acc-label">FLOAT P&amp;L</span>
               <span class="mt5-acc-value" id="mt5Profit">—</span>
             </div>
           </div>
-          <!-- Open Positions Mini-List -->
+          <!-- Open Positions -->
           <div class="mt5-positions" id="mt5PositionsList" hidden>
             <div class="mt5-pos-header">
               <span class="ct">OPEN POSITIONS</span>
               <span class="cs" id="mt5PosCount">0</span>
             </div>
             <div class="mt5-pos-rows" id="mt5PosRows">
-              <!-- Dynamically populated by script.js -->
+              <!-- Populated by script.js -->
             </div>
           </div>
-          <!-- Quick Connect Row -->
           <div class="mt5-quick-row">
-            <button class="btn btn-ghost btn-sm" onclick="openMT5Modal()">⚙ SETUP BRIDGE</button>
-            <span class="mt5-latency" id="mt5Latency"></span>
+            <button class="btn btn-ghost btn-sm" onclick="openBridgeModal()">⚙ BRIDGE SETUP</button>
+            <span class="mt5-latency-badge" id="mt5Latency"></span>
           </div>
-        </div><!-- /.mt5-bridge-panel -->
+        </div><!-- /.mt5-acc-panel -->
 
-        <!-- ── PERFORMANCE METRICS ── -->
+        <!-- ── KILLZONE STATUS ── -->
+        <div class="kz-bar card" id="kzBar">
+          <div class="kz-label-row">
+            <span class="ct">⏰ KILLZONE STATUS</span>
+            <span class="kz-utc-clock" id="kzUtcClock">--:-- UTC</span>
+          </div>
+          <div class="kz-sessions" id="kzSessions" role="list">
+            <!-- Populated by script.js -->
+          </div>
+        </div>
+
+        <!-- ── SESSION METRICS ROW ── -->
         <div class="metrics-row" role="list">
           <div class="mc" role="listitem">
-            <div class="mc-label">NET P&amp;L</div>
-            <div class="mc-value mc-value--green" id="mc-pnl">+$0</div>
+            <div class="mc-label">SESSION P&amp;L</div>
+            <div class="mc-value green" id="sess-pnl">+$0</div>
           </div>
           <div class="mc" role="listitem">
-            <div class="mc-label">WINRATE</div>
-            <div class="mc-value mc-value--gold" id="mc-wr">0%</div>
+            <div class="mc-label">SESSION WR</div>
+            <div class="mc-value gold" id="sess-wr">0%</div>
           </div>
           <div class="mc" role="listitem">
-            <div class="mc-label">SIGNALS</div>
-            <div class="mc-value mc-value--cyan" id="mc-sig">0</div>
+            <div class="mc-label">SIG TODAY</div>
+            <div class="mc-value cyan" id="sess-sig">0</div>
           </div>
           <div class="mc" role="listitem">
             <div class="mc-label">MAX DD</div>
-            <div class="mc-value mc-value--red" id="mc-dd">0%</div>
+            <div class="mc-value red" id="sess-dd">0%</div>
           </div>
-        </div><!-- /.metrics-row -->
+        </div>
 
         <!-- ── ORDERFLOW CHART ── -->
         <div class="chart-card card" id="chartCard">
           <div class="ch chart-ch">
-            <span class="ct">ORDERFLOW CHART</span>
-            <!-- Killzone Widget -->
-            <div class="kz-widget" id="kzWidget" hidden>
-              <span class="kz-dot" id="kzDot" aria-hidden="true"></span>
-              <span class="kz-time" id="kzTime">--:--:--</span>
-              <span class="kz-session" id="kzSession">--</span>
-            </div>
-            <!-- Symbol Selector -->
+            <span class="ct">CHART — TRADINGVIEW</span>
+            <!-- Symbol Badge -->
             <button class="sym-badge" id="symBadge" onclick="openSymModal()" aria-label="Select instrument">
               <span id="symLabel">XAUUSD</span>
               <span class="sym-caret" aria-hidden="true">▾</span>
@@ -399,15 +721,145 @@
               title="TradingView Chart"
               allowfullscreen
               loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-popups"
             ></iframe>
           </div>
         </div><!-- /.chart-card -->
 
-        <!-- ── AI SENTIMENT METER (Terminal) ── -->
+        <!-- ── SIGNAL TABLE TABS ── -->
+        <div class="sig-table-card card" id="sigTableCard">
+          <div class="sig-tabs-bar" role="tablist">
+            <button class="sig-tab sig-tab--active" id="stab-sinyal" role="tab" aria-selected="true"
+                    onclick="switchSigTab('sinyal',this)">
+              Sinyal
+              <span class="sig-tab-count" id="stab-sig-count">0</span>
+            </button>
+            <button class="sig-tab" id="stab-heatmap" role="tab" aria-selected="false"
+                    onclick="switchSigTab('heatmap',this)">
+              CS Heatmap
+            </button>
+            <button class="sig-tab" id="stab-posisi" role="tab" aria-selected="false"
+                    onclick="switchSigTab('posisi',this)">
+              Posisi
+              <span class="sig-tab-count" id="stab-pos-count">0</span>
+            </button>
+          </div>
+
+          <!-- Tab: Signal Table -->
+          <div class="tab-panel" id="tabSinyal" role="tabpanel">
+            <div class="sig-table-wrap">
+              <table class="sig-table" id="sigTable" aria-label="Signal history">
+                <thead>
+                  <tr>
+                    <th>PAIR</th>
+                    <th>TF</th>
+                    <th>DIR</th>
+                    <th>ENTRY</th>
+                    <th class="col-sl">SL</th>
+                    <th class="col-tp">TP</th>
+                    <th>SWEEP</th>
+                    <th>R:R</th>
+                    <th>STRENGTH</th>
+                    <th>WAKTU</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="sigTableBody">
+                  <tr class="sig-empty-row">
+                    <td colspan="11">— Klik SCAN untuk generate signal dari harga live —</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TF Winrate Stats -->
+            <div class="tf-wr-section">
+              <div class="tf-wr-title">WINRATE PER TIMEFRAME</div>
+              <div class="tf-wr-grid" role="list">
+                <div class="twrc c1" role="listitem">
+                  <div class="twrc-name">M15</div>
+                  <div class="twrc-pct" id="wr-m15" style="color:var(--green)">—</div>
+                  <div class="twrc-nums">
+                    <span class="ww" id="w-m15">—</span>
+                    <span class="wl" id="l-m15">—</span>
+                    <span class="wo" id="o-m15">—</span>
+                  </div>
+                  <div class="twrc-sub">R:<span id="r-m15">—</span> PF:<span id="pf-m15">—</span></div>
+                </div>
+                <div class="twrc c2" role="listitem">
+                  <div class="twrc-name">M30</div>
+                  <div class="twrc-pct" id="wr-m30" style="color:var(--gold)">—</div>
+                  <div class="twrc-nums">
+                    <span class="ww" id="w-m30">—</span>
+                    <span class="wl" id="l-m30">—</span>
+                    <span class="wo" id="o-m30">—</span>
+                  </div>
+                  <div class="twrc-sub">R:<span id="r-m30">—</span> PF:<span id="pf-m30">—</span></div>
+                </div>
+                <div class="twrc c3" role="listitem">
+                  <div class="twrc-name">H1</div>
+                  <div class="twrc-pct" id="wr-h1" style="color:var(--cyan)">—</div>
+                  <div class="twrc-nums">
+                    <span class="ww" id="w-h1">—</span>
+                    <span class="wl" id="l-h1">—</span>
+                    <span class="wo" id="o-h1">—</span>
+                  </div>
+                  <div class="twrc-sub">R:<span id="r-h1">—</span> PF:<span id="pf-h1">—</span></div>
+                </div>
+                <div class="twrc c4" role="listitem">
+                  <div class="twrc-name">H4</div>
+                  <div class="twrc-pct" id="wr-h4" style="color:var(--purple)">—</div>
+                  <div class="twrc-nums">
+                    <span class="ww" id="w-h4">—</span>
+                    <span class="wl" id="l-h4">—</span>
+                    <span class="wo" id="o-h4">—</span>
+                  </div>
+                  <div class="twrc-sub">R:<span id="r-h4">—</span> PF:<span id="pf-h4">—</span></div>
+                </div>
+              </div>
+              <div class="tf-wr-total-bar">
+                <span>TOTAL <strong id="totalSig">0 sinyal</strong></span>
+                <span>WR <strong class="green" id="totalWR">0%</strong> · <span id="totalWL">0W/0L</span></span>
+                <span class="gold" id="totalPL">P&L +0.0R</span>
+              </div>
+            </div>
+          </div><!-- /#tabSinyal -->
+
+          <!-- Tab: Currency Strength Heatmap -->
+          <div class="tab-panel" id="tabHeatmap" role="tabpanel" hidden>
+            <div class="cs-card-inner">
+              <div class="cs-header-row">
+                <span class="ct">CURRENCY STRENGTH METER</span>
+                <span class="cs" id="csLastUpdate">LIVE</span>
+              </div>
+              <div class="cs-wrap" id="csWrap" aria-live="polite">
+                <!-- Populated by script.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Open Positions -->
+          <div class="tab-panel" id="tabPosisi" role="tabpanel" hidden>
+            <div class="pos-table-wrap">
+              <table class="sig-table" aria-label="Open positions">
+                <thead>
+                  <tr>
+                    <th>PAIR</th><th>DIR</th><th>ENTRY</th><th>LIVE</th>
+                    <th>SL</th><th>TP</th><th>LOT</th><th>PROFIT</th><th>TIME</th>
+                  </tr>
+                </thead>
+                <tbody id="posTableBody">
+                  <tr class="sig-empty-row"><td colspan="9">Tidak ada posisi terbuka</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /.sig-table-card -->
+
+        <!-- ── AI SENTIMENT METER ── -->
         <div class="sab card" id="terminalSentiment">
           <div class="ch">
-            <span class="ct">AI DAILY BIAS</span>
+            <span class="ct">🤖 AI DAILY BIAS — ALCHEMIST v9</span>
             <span class="sab-verdict" id="termSabVerdict">BULLISH</span>
           </div>
           <div class="sab-body">
@@ -415,12 +867,15 @@
               <div class="sab-needle" id="termSabNeedle" style="left:65%;" aria-hidden="true"></div>
             </div>
             <div class="sab-labels">
-              <span class="sab-label sab-label--bear">BEARISH</span>
-              <span class="sab-label sab-label--neutral">NETRAL</span>
-              <span class="sab-label sab-label--bull">BULLISH</span>
+              <span class="sab-label bear">BEARISH</span>
+              <span class="sab-label neutral">NETRAL</span>
+              <span class="sab-label bull">BULLISH</span>
             </div>
           </div>
-        </div><!-- /.sab -->
+          <div class="sab-confluence-row" id="sabConfluence">
+            <!-- Confluence factors populated by script.js -->
+          </div>
+        </div>
 
         <!-- ── ORDERBOOK DOM ── -->
         <div class="ob-card card" id="obCard">
@@ -431,82 +886,68 @@
           <div class="ob-wrap">
             <div class="ob-grid">
               <div class="ob-side">
-                <div class="ob-side-label ob-side-label--bid">BIDS — BUY WALL</div>
-                <div class="ob-rows" id="obBids" aria-label="Bid prices" aria-live="polite">
-                  <!-- Dynamically populated -->
+                <div class="ob-side-label bid">BIDS — BUY WALL</div>
+                <div class="ob-rows" id="obBids" aria-live="polite">
+                  <!-- Populated by script.js -->
                 </div>
               </div>
               <div class="ob-side">
-                <div class="ob-side-label ob-side-label--ask">ASKS — SELL WALL</div>
-                <div class="ob-rows" id="obAsks" aria-label="Ask prices" aria-live="polite">
-                  <!-- Dynamically populated -->
+                <div class="ob-side-label ask">ASKS — SELL WALL</div>
+                <div class="ob-rows" id="obAsks" aria-live="polite">
+                  <!-- Populated by script.js -->
                 </div>
               </div>
             </div>
+            <div class="ob-mid-price" id="obMidPrice">MID: —</div>
           </div>
-        </div><!-- /.ob-card -->
+        </div>
 
-        <!-- ── CURRENCY STRENGTH METER ── -->
-        <div class="cs-card card" id="csCard">
-          <div class="ch">
-            <span class="ct">CURRENCY STRENGTH METER</span>
-            <span class="cs" id="csLastUpdate">LIVE</span>
-          </div>
-          <div class="cs-wrap" id="csWrap" aria-live="polite">
-            <!-- Dynamically populated by script.js -->
-          </div>
-        </div><!-- /.cs-card -->
-
-        <!-- ── ALGO ENGINE STATUS ── -->
+        <!-- ── EXPERT ADVISOR ENGINE STATUS ── -->
         <div class="algo-card card" id="algoCard">
           <div class="ch">
-            <span class="ct">ALGO ENGINE</span>
+            <span class="ct">EXPERT ADVISOR ENGINE</span>
+            <span class="cs">ALCHEMIST v9</span>
           </div>
           <div class="ss-bar">
-            <span class="ss-dot ss-dot--run" id="sBlob" aria-hidden="true"></span>
-            <span class="ss-name" id="sTxt">STRATEGY RUNNING</span>
+            <span class="ss-dot run" id="sBlob" aria-hidden="true"></span>
+            <span class="ss-name" id="sTxt">EXPERT ADVISOR RUNNING — Alchemist v9</span>
             <span class="ss-time" id="sTime">00:00:00</span>
           </div>
           <div class="algo-btns">
             <button class="btn btn-gold2 btn-sm" id="btnPause" onclick="toggleStrat()">⏸ PAUSE</button>
-            <button class="btn btn-red btn-sm"   onclick="stopStrat()">⏹ STOP</button>
-            <button class="btn btn-cyan btn-sm"  onclick="resetStrat()">↺ RESET</button>
+            <button class="btn btn-red   btn-sm" onclick="stopStrat()">⏹ STOP</button>
+            <button class="btn btn-cyan  btn-sm" onclick="resetStrat()">↺ RESET</button>
           </div>
-        </div><!-- /.algo-card -->
+        </div>
 
         <!-- ── RISK PARAMETERS ── -->
         <div class="risk-card card" id="riskCard">
           <div class="ch">
-            <span class="ct">RISK PARAMS — LIVE</span>
-            <span class="cs" id="riskMT5Note">LOCAL CALC</span>
+            <span class="ct">RISK PARAMS — LIVE CALC</span>
+            <span class="cs" id="riskMT5Note">LOCAL</span>
           </div>
           <div class="risk-body">
             <div class="rp-row">
               <label class="rp-label" for="eqInp">EQUITY ($)</label>
-              <input
-                type="number"
-                class="field field-inline"
-                id="eqInp"
-                value="10000"
-                min="0"
-                step="100"
-                oninput="calcLot()"
-                aria-label="Account equity"
-              />
+              <input type="number" class="field field-inline" id="eqInp"
+                     value="10000" min="0" step="100" oninput="calcLot()"
+                     aria-label="Account equity" />
             </div>
             <div class="rp-slider-row">
               <div class="rp-slider-header">
                 <span class="rp-label">MAX DRAWDOWN / DAY</span>
                 <span class="rp-value" id="ddLbl">5%</span>
               </div>
-              <input type="range" id="ddRange" min="1" max="10" value="5" step="1" oninput="setDD(this.value)" aria-label="Max drawdown" />
+              <input type="range" id="ddRange" min="1" max="10" value="5" step="1"
+                     oninput="setDD(this.value)" aria-label="Max drawdown" />
             </div>
             <div class="rp-slider-row">
               <div class="rp-slider-header">
                 <span class="rp-label">RISK / TRADE</span>
                 <span class="rp-value" id="rptLbl">1%</span>
               </div>
-              <input type="range" id="rptRange" min="0.5" max="3" value="1" step="0.5" oninput="setRPT(this.value)" aria-label="Risk per trade" />
+              <input type="range" id="rptRange" min="0.5" max="3" value="1" step="0.5"
+                     oninput="setRPT(this.value)" aria-label="Risk per trade" />
             </div>
             <div class="rp-row">
               <span class="rp-label">SL MAX</span>
@@ -522,7 +963,7 @@
             </div>
             <div class="mm-tip">
               💡 <strong>Rule:</strong> Jangan pernah risk lebih dari <strong>1–2%</strong> per trade.
-              Dengan equity $10K &amp; SL 20 pips, lot aman adalah <strong>0.05–0.10</strong>.
+              Equity $10K + SL 20 pips = lot aman <strong>0.05–0.10</strong>.
               Max DD harian 5% = stop trading setelah loss $500.
             </div>
           </div>
@@ -532,7 +973,7 @@
         <div class="signal-card card" id="signalCard">
           <div class="ch">
             <span class="ct">AI SIGNAL GENERATOR</span>
-            <span class="cs">ALCHEMIST v8</span>
+            <span class="cs">ALCHEMIST v9 · LIVE PRICE</span>
           </div>
           <div class="eng-body">
 
@@ -540,14 +981,14 @@
             <div class="eng-section">
               <label class="flabel">TRADING STYLE</label>
               <div class="style-tabs" role="group" aria-label="Trading style">
-                <button class="style-tab style-tab--active" id="st-scalp"   onclick="setStyle('scalp',this)">
-                  SCALPING<br><span class="style-sub">1M–5M · SL 10pip</span>
+                <button class="style-tab style-tab--active" id="st-scalp" onclick="setStyle('scalp',this)">
+                  SCALPING<br><span class="style-sub">1M–5M · SL 10pip · R:R 1:5</span>
                 </button>
-                <button class="style-tab" id="st-intra"                     onclick="setStyle('intraday',this)">
-                  INTRADAY<br><span class="style-sub">15M–4H · SL 20pip</span>
+                <button class="style-tab" id="st-intra" onclick="setStyle('intraday',this)">
+                  INTRADAY<br><span class="style-sub">15M–4H · SL 20pip · R:R 1:5</span>
                 </button>
-                <button class="style-tab" id="st-swing"                     onclick="setStyle('swing',this)">
-                  SWING<br><span class="style-sub">4H–1D · SL 50pip</span>
+                <button class="style-tab" id="st-swing" onclick="setStyle('swing',this)">
+                  SWING<br><span class="style-sub">4H–1D · SL 50pip · R:R 1:8</span>
                 </button>
               </div>
             </div>
@@ -563,33 +1004,33 @@
                   <option value="GBPUSD">GBPUSD — Pound/USD</option>
                   <option value="USDJPY">USDJPY — USD/Yen</option>
                   <option value="GBPJPY">GBPJPY — Pound/Yen</option>
-                  <option value="AUDUSD">AUDUSD — Aussie/USD</option>
-                  <option value="USDCAD">USDCAD — USD/CAD</option>
+                  <option value="ETHUSD">ETHUSD — Ethereum</option>
                   <option value="XAGUSD">XAGUSD — Silver</option>
                   <option value="WTIUSD">WTIUSD — Oil WTI</option>
                   <option value="NAS100">NAS100 — Nasdaq</option>
                   <option value="US30">US30 — Dow Jones</option>
+                  <option value="USDCAD">USDCAD — USD/CAD</option>
                 </select>
               </div>
               <div>
                 <label class="flabel" for="sigStrat">STRATEGY</label>
                 <select class="field" id="sigStrat" aria-label="Strategy">
-                  <option value="alch">Alchemist QM + OCL</option>
-                  <option value="ict">ICT AMD + Killzone</option>
-                  <option value="msnr">MSNR RBS + SBR</option>
-                  <option value="crt">CRT TBS + Sweep</option>
-                  <option value="full">FULL CONFLUENCE ★</option>
+                  <option value="alch">Alchemist QM + OCL + SBR</option>
+                  <option value="ict">ICT AMD + Killzone + OTE</option>
+                  <option value="msnr">MSNR OCL + RBS + CE</option>
+                  <option value="crt">CRT TBS + EQH Sweep</option>
+                  <option value="full">FULL CONFLUENCE ★ (All Methods)</option>
                 </select>
               </div>
             </div>
 
             <!-- Scan Button -->
             <button class="btn btn-green" id="btnScan" onclick="genSignal()">
-              ▶ SCAN &amp; GENERATE AI SIGNAL
+              ▶ SCAN &amp; GENERATE AI SIGNAL (LIVE PRICE)
             </button>
 
             <!-- Divider -->
-            <div class="or-divider"><span>atau upload foto chart</span></div>
+            <div class="or-divider"><span>atau upload foto chart untuk analisa AI</span></div>
 
             <!-- Photo Chart Analysis Drop Zone -->
             <div
@@ -605,7 +1046,7 @@
               onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('chartPhotoInput').click()}"
             >
               <span class="pd-icon" aria-hidden="true">📷</span>
-              <span class="pd-title">AI PHOTO CHART ANALYSIS</span>
+              <span class="pd-title">AI PHOTO CHART ANALYSIS — Claude Vision</span>
               <span class="pd-sub">PNG · JPG · WEBP — Drag &amp; drop atau tap</span>
               <span class="pd-tier-note" id="photoTierNote">Memuat info plan…</span>
             </div>
@@ -616,72 +1057,38 @@
                 <img id="photoPreviewImg" src="" alt="Chart preview" />
                 <div class="photo-preview-overlay">
                   <button class="btn btn-purple btn-sm" onclick="runPhotoAnalysis()">
-                    🤖 ANALISA DENGAN AI
+                    🤖 ANALISA DENGAN CLAUDE AI
                   </button>
                   <button class="btn btn-ghost btn-sm" onclick="clearPhoto()">
                     ✕ HAPUS
                   </button>
                 </div>
               </div>
+              <!-- Photo Analysis Result -->
+              <div class="photo-result" id="photoResult" hidden>
+                <!-- Populated by script.js after Claude API response -->
+              </div>
             </div>
 
             <!-- Hidden File Input -->
-            <input
-              type="file"
-              id="chartPhotoInput"
-              accept="image/*"
-              style="display:none;"
-              onchange="loadPhotoPreview(this)"
-            />
+            <input type="file" id="chartPhotoInput" accept="image/*"
+                   style="display:none;" onchange="loadPhotoPreview(this)" />
 
             <!-- Voice Alert Test -->
-            <button class="btn btn-ghost btn-sm" onclick="voiceAlert()">🔊 VOICE ALERT TEST</button>
+            <button class="btn btn-ghost btn-sm" onclick="voiceAlert()">
+              🔊 VOICE ALERT TEST ("SIKAT!!!")
+            </button>
 
           </div><!-- /.eng-body -->
 
-          <!-- Signal Feed -->
+          <!-- Signal Feed Output -->
           <div class="sig-feed" id="sigFeed" aria-live="polite" aria-label="Signal output">
-            <div class="sig-feed-empty">— PILIH STYLE &amp; KLIK SCAN —</div>
+            <div class="sig-feed-empty">
+              — PILIH STYLE &amp; KLIK SCAN — HARGA DIAMBIL REALTIME —
+            </div>
           </div>
 
         </div><!-- /.signal-card -->
-
-        <!-- ── ASK BUDDY BUTTON ── -->
-        <button class="buddy-btn" onclick="askBuddy()" aria-label="Ask Shelen Buddy">
-          🤖 ASK SHELEN BUDDY — Ringkasan Market &amp; Tips via Voice
-        </button>
-
-        <!-- ── UI ARCHITECT PANEL ── -->
-        <div class="architect-panel card" id="architectPanel">
-          <div class="ch"><span class="ct">🎨 THE ARCHITECT — UI CUSTOMIZER</span></div>
-          <div class="arch-body">
-            <div class="arch-row">
-              <span class="arch-label">Accent Color (Gold)</span>
-              <input
-                type="color"
-                class="color-picker"
-                id="accentColorPicker"
-                value="#f0b44a"
-                oninput="changeAccentColor(this.value)"
-                aria-label="Accent color"
-              />
-            </div>
-            <div class="arch-row">
-              <span class="arch-label">CRT Scanlines Effect</span>
-              <div class="toggle-wrap">
-                <button
-                  class="toggle"
-                  id="scanToggle"
-                  role="switch"
-                  aria-checked="false"
-                  onclick="toggleScanlines()"
-                  aria-label="Toggle CRT scanlines"
-                ></button>
-                <span class="toggle-label" id="scanLabel">OFF</span>
-              </div>
-            </div>
-          </div>
-        </div><!-- /.architect-panel -->
 
         <!-- ── EXECUTION LOG ── -->
         <div class="log-card card" id="logCard">
@@ -690,9 +1097,16 @@
             <button class="log-clear-btn" onclick="clearLog()" aria-label="Clear log">CLR</button>
           </div>
           <div class="log-body" id="logBody" role="log" aria-live="polite">
-            <!-- Dynamically populated -->
+            <div class="log-line sys">
+              <span class="log-ts">INIT</span>
+              <span class="log-msg">SALC v14 Expert Advisor Engine — Ready</span>
+            </div>
+            <div class="log-line sys">
+              <span class="log-ts">00:01</span>
+              <span class="log-msg">Dual WSS: Binance (BTC/ETH gratis) + TwelveData (forex/gold)</span>
+            </div>
           </div>
-        </div><!-- /.log-card -->
+        </div>
 
         <div class="page-bottom-spacer"></div>
 
@@ -701,14 +1115,14 @@
 
 
     <!-- ===============================================================
-         PAGE: NEWS
+         PAGE: NEWS — Bloomberg Style
     ================================================================ -->
     <section class="page" id="pg-news" role="main" aria-label="Financial News" hidden>
 
       <!-- Lock Overlay -->
-      <div class="lock" id="lock-news" role="alertdialog" aria-label="Plan upgrade required">
+      <div class="lock" id="lock-news" role="alertdialog">
         <span class="lock-ico" aria-hidden="true">🔒</span>
-        <h2 class="lock-title">PLAN MEDIUM+</h2>
+        <h2 class="lock-title">MEDIUM+ REQUIRED</h2>
         <p class="lock-desc">Upgrade ke Medium atau Premium<br>untuk akses Bloomberg News &amp; Calendar</p>
         <button class="btn btn-gold" onclick="goPage('pricing')">UPGRADE SEKARANG</button>
       </div>
@@ -716,14 +1130,14 @@
       <!-- News Content -->
       <div class="news-content" id="nc-content" hidden>
 
-        <!-- Header Row -->
+        <!-- Header -->
         <div class="news-header-row">
-          <span class="section-eyebrow">FINANCIAL NEWS</span>
+          <span class="section-eyebrow">📰 FINANCIAL NEWS</span>
           <span class="news-clock" id="newsClock">--:-- UTC</span>
         </div>
 
-        <!-- Category Filter Bar -->
-        <div class="nf-bar" id="nfBar" role="group" aria-label="News category filter">
+        <!-- Category Filter -->
+        <div class="nf-bar" id="nfBar" role="group" aria-label="News filter">
           <button class="nf-btn nf-btn--active" data-cat="all"       onclick="filterNews('all',this)">ALL</button>
           <button class="nf-btn"                data-cat="fx"        onclick="filterNews('fx',this)">FOREX</button>
           <button class="nf-btn"                data-cat="crypto"    onclick="filterNews('crypto',this)">CRYPTO</button>
@@ -732,10 +1146,10 @@
           <button class="nf-btn"                data-cat="commodity" onclick="filterNews('commodity',this)">COMMODITY</button>
         </div>
 
-        <!-- AI Daily Bias Sentiment Bar -->
+        <!-- AI Daily Bias Bar -->
         <div class="sab card" id="newsSentimentBar">
           <div class="ch">
-            <span class="ct">🤖 AI DAILY BIAS</span>
+            <span class="ct">🤖 AI DAILY BIAS — ALCHEMIST v9</span>
             <span class="sab-verdict" id="newsSabVerdict">BULLISH</span>
           </div>
           <div class="sab-body">
@@ -743,35 +1157,35 @@
               <div class="sab-needle" id="newsSabNeedle" style="left:65%;" aria-hidden="true"></div>
             </div>
             <div class="sab-labels">
-              <span class="sab-label sab-label--bear">BEARISH</span>
-              <span class="sab-label sab-label--neutral">NETRAL</span>
-              <span class="sab-label sab-label--bull">BULLISH</span>
+              <span class="sab-label bear">BEARISH</span>
+              <span class="sab-label neutral">NETRAL</span>
+              <span class="sab-label bull">BULLISH</span>
             </div>
           </div>
         </div>
 
-        <!-- News List Feed -->
+        <!-- News List -->
         <div class="news-list" id="newsList" aria-live="polite">
-          <!-- Dynamically populated by script.js -->
+          <!-- Populated by script.js -->
         </div>
 
         <!-- Economic Calendar -->
         <div class="section-divider">
-          <span class="section-divider-label">ECONOMIC CALENDAR</span>
+          <span class="section-divider-label">📅 ECONOMIC CALENDAR</span>
         </div>
         <div class="card eco-card" id="ecoCard">
           <div id="ecoList">
-            <!-- Dynamically populated by script.js -->
+            <!-- Populated by script.js -->
           </div>
         </div>
 
         <!-- Market Sentiment Bars -->
         <div class="section-divider">
-          <span class="section-divider-label">MARKET SENTIMENT</span>
+          <span class="section-divider-label">📊 MARKET SENTIMENT</span>
         </div>
-        <div class="card" id="sentCard">
+        <div class="card sent-card">
           <div class="sent-wrap" id="sentList" aria-live="polite">
-            <!-- Dynamically populated by script.js -->
+            <!-- Populated by script.js -->
           </div>
         </div>
 
@@ -782,22 +1196,22 @@
 
 
     <!-- ===============================================================
-         PAGE: JOURNAL
+         PAGE: JOURNAL — Smart Trade Tracker
     ================================================================ -->
     <section class="page" id="pg-journal" role="main" aria-label="Trade Journal" hidden>
 
       <!-- Lock Overlay -->
-      <div class="lock" id="lock-journal" role="alertdialog" aria-label="Access locked">
+      <div class="lock" id="lock-journal" role="alertdialog">
         <span class="lock-ico" aria-hidden="true">🔒</span>
         <h2 class="lock-title">AKSES TERKUNCI</h2>
-        <p class="lock-desc">Login untuk mencatat<br>dan menganalisa tradingmu</p>
+        <p class="lock-desc">Login untuk mencatat<br>dan menganalisa perjalanan tradingmu</p>
         <button class="btn btn-gold" onclick="openAuth()">LOGIN / DAFTAR</button>
       </div>
 
       <!-- Journal Content -->
       <div class="journal-content" id="jc-content" hidden>
 
-        <!-- ── TOP STATS ── -->
+        <!-- Top Stats -->
         <div class="j-stats-grid" role="list">
           <div class="jsc jsc-blue" role="listitem">
             <span class="jsc-label">TOTAL TRADES</span>
@@ -821,34 +1235,26 @@
           </div>
         </div>
 
-        <!-- Share / Export Row -->
+        <!-- Action Row -->
         <div class="journal-action-row">
           <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 EXPORT CSV</button>
           <button class="btn share-story-btn btn-sm" onclick="shareToIG()">📸 SHARE IG STORY</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAllTrades()">🗑 HAPUS SEMUA</button>
         </div>
 
-        <!-- ── WINRATE RING + DRAWDOWN ── -->
+        <!-- Analytics Grid: Winrate + Drawdown -->
         <div class="analytics-duo-grid">
 
           <!-- Winrate Ring -->
           <div class="card wr-card">
-            <div class="ch"><span class="ct">WINRATE</span></div>
+            <div class="ch"><span class="ct">WINRATE RING</span></div>
             <div class="wr-wrap">
               <div class="wr-ring" aria-label="Winrate ring chart">
-                <svg
-                  class="wr-svg"
-                  viewBox="0 0 105 105"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
+                <svg class="wr-svg" viewBox="0 0 105 105" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <circle class="wr-bg-circle" cx="52.5" cy="52.5" r="45" />
-                  <circle
-                    class="wr-arc-circle"
-                    id="wrArc"
-                    cx="52.5" cy="52.5" r="45"
-                    stroke-dasharray="282.74"
-                    stroke-dashoffset="282.74"
-                  />
+                  <circle class="wr-arc-circle" id="wrArc"
+                          cx="52.5" cy="52.5" r="45"
+                          stroke-dasharray="282.74" stroke-dashoffset="282.74" />
                 </svg>
                 <div class="wr-center-text">
                   <span class="wr-pct" id="wrPct">0%</span>
@@ -858,42 +1264,42 @@
             </div>
             <div class="wr-stats-row">
               <div class="wr-stat">
-                <span class="wr-stat-num wr-stat-num--win" id="wW">0</span>
+                <span class="wr-stat-num win" id="wW">0</span>
                 <span class="wr-stat-label">WINS</span>
               </div>
               <div class="wr-stat">
-                <span class="wr-stat-num wr-stat-num--loss" id="wL">0</span>
+                <span class="wr-stat-num loss" id="wL">0</span>
                 <span class="wr-stat-label">LOSSES</span>
               </div>
             </div>
-          </div><!-- /.wr-card -->
+          </div>
 
-          <!-- Drawdown Meter + Heatmap -->
+          <!-- Drawdown + Heatmap -->
           <div class="card dd-card">
             <div class="ch"><span class="ct">DRAWDOWN</span></div>
             <div class="dd-wrap">
               <div class="dd-header-row">
                 <span class="dd-label">CURRENT DD</span>
-                <span class="dd-value" id="ddcur">0.0%</span>
+                <span class="dd-value red" id="ddcur">0.0%</span>
               </div>
               <div class="dd-track">
                 <div class="dd-fill" id="ddFill" style="width:0%;" aria-hidden="true"></div>
               </div>
               <div class="dd-ticks">
-                <span>0%</span><span class="dd-tick-mid">5%</span><span>10%</span>
+                <span>0%</span><span class="dd-tick-mid gold">5%</span><span>10%</span>
               </div>
             </div>
             <div class="hm-wrap">
               <div class="hm-title">P&amp;L BY PAIR</div>
               <div class="hm" id="hmGrid" aria-label="P&L heatmap by pair">
-                <!-- Dynamically populated -->
+                <!-- Populated by script.js -->
               </div>
             </div>
-          </div><!-- /.dd-card -->
+          </div>
 
         </div><!-- /.analytics-duo-grid -->
 
-        <!-- ── EQUITY CURVE CANVAS ── -->
+        <!-- Equity Curve -->
         <div class="card eq-card">
           <div class="ch">
             <span class="ct">EQUITY CURVE</span>
@@ -904,7 +1310,7 @@
           </div>
         </div>
 
-        <!-- ── PARTIAL CLOSE MANAGER ── -->
+        <!-- Partial Close Manager -->
         <div class="card pc-card">
           <div class="ch"><span class="ct">TRADE MANAGER — PARTIAL CLOSE</span></div>
           <div class="pc-wrap">
@@ -912,14 +1318,9 @@
               <span class="pc-label">CLOSE PERCENTAGE</span>
               <span class="pc-pct-display" id="pcPct">50%</span>
             </div>
-            <input
-              type="range"
-              id="pcRange"
-              class="pc-range"
-              min="10" max="100" value="50" step="10"
-              oninput="updatePC(this.value)"
-              aria-label="Partial close percentage"
-            />
+            <input type="range" id="pcRange" class="pc-range"
+                   min="10" max="100" value="50" step="10"
+                   oninput="updatePC(this.value)" aria-label="Partial close %" />
             <div class="pc-calc-grid">
               <div class="pc-calc-box">
                 <span class="pc-calc-label">LOT TO CLOSE</span>
@@ -927,21 +1328,21 @@
               </div>
               <div class="pc-calc-box">
                 <span class="pc-calc-label">REMAINING LOT</span>
-                <span class="pc-calc-value pc-calc-value--green" id="pcRem">0.05</span>
+                <span class="pc-calc-value green" id="pcRem">0.05</span>
               </div>
               <div class="pc-calc-box">
                 <span class="pc-calc-label">BREAKEVEN</span>
-                <span class="pc-calc-value pc-calc-value--gold" id="pcBE">—</span>
+                <span class="pc-calc-value gold" id="pcBE">—</span>
               </div>
               <div class="pc-calc-box">
                 <span class="pc-calc-label">SECURED P&amp;L</span>
-                <span class="pc-calc-value pc-calc-value--green" id="pcPnl">—</span>
+                <span class="pc-calc-value green" id="pcPnl">—</span>
               </div>
             </div>
           </div>
-        </div><!-- /.pc-card -->
+        </div>
 
-        <!-- ── TRADE LOG ── -->
+        <!-- Trade Log -->
         <div class="card trade-log-card">
           <div class="ch">
             <span class="ct">TRADE LOG</span>
@@ -950,40 +1351,40 @@
             </div>
           </div>
           <div class="trade-cards" id="tradeCards" role="list" aria-live="polite">
-            <!-- Dynamically populated -->
+            <!-- Populated by script.js -->
           </div>
         </div>
 
-        <!-- ── ADD TRADE FORM ── -->
+        <!-- Add Trade Form -->
         <div class="card add-trade-card">
-          <div class="ch"><span class="ct">TAMBAH TRADE BARU</span></div>
+          <div class="ch"><span class="ct">+ TAMBAH TRADE BARU</span></div>
           <div class="atf">
             <div class="atf-row">
               <div>
                 <label class="flabel" for="tPair">PAIR</label>
-                <select class="field" id="tPair" aria-label="Trading pair">
+                <select class="field" id="tPair">
                   <option>XAUUSD</option><option>BTCUSD</option>
                   <option>EURUSD</option><option>GBPUSD</option>
                   <option>USDJPY</option><option>GBPJPY</option>
-                  <option>NAS100</option><option>US30</option>
-                  <option>XAGUSD</option><option>WTIUSD</option>
+                  <option>ETHUSD</option><option>NAS100</option>
+                  <option>US30</option><option>XAGUSD</option><option>WTIUSD</option>
                 </select>
               </div>
               <div>
                 <label class="flabel" for="tDir">DIRECTION</label>
-                <select class="field" id="tDir" aria-label="Trade direction">
-                  <option value="BUY">BUY ▲</option>
-                  <option value="SELL">SELL ▼</option>
+                <select class="field" id="tDir">
+                  <option value="BUY">BUY ▲ LONG</option>
+                  <option value="SELL">SELL ▼ SHORT</option>
                 </select>
               </div>
             </div>
             <div class="atf-row">
               <div>
-                <label class="flabel" for="tE">ENTRY</label>
+                <label class="flabel" for="tE">ENTRY PRICE</label>
                 <input type="number" class="field" id="tE" placeholder="3318.50" step="0.01" />
               </div>
               <div>
-                <label class="flabel" for="tX">EXIT</label>
+                <label class="flabel" for="tX">EXIT PRICE</label>
                 <input type="number" class="field" id="tX" placeholder="3328.50" step="0.01" />
               </div>
             </div>
@@ -1008,20 +1409,16 @@
               </div>
             </div>
             <div>
-              <label class="flabel" for="tNote">NOTES</label>
-              <textarea
-                class="field"
-                id="tNote"
-                placeholder="Setup: QM + OCL retest. Confluence: SBR level + FVG aligned with NY KZ..."
-              ></textarea>
+              <label class="flabel" for="tNote">NOTES / SETUP</label>
+              <textarea class="field" id="tNote"
+                placeholder="Setup: QM + OCL retest. Confluence: SBR level + FVG aligned with NY KZ. BUY LIMIT di CE 0.786 OTE. Risk 1%."></textarea>
             </div>
             <button class="btn btn-gold" onclick="addTrade()">+ LOG TRADE TO JOURNAL</button>
           </div>
         </div>
 
-        <!-- Hidden canvas for IG Story export -->
+        <!-- Hidden canvas for IG Story -->
         <canvas id="shareCanvas" hidden aria-hidden="true"></canvas>
-
         <div class="page-bottom-spacer"></div>
 
       </div><!-- /#jc-content -->
@@ -1029,28 +1426,28 @@
 
 
     <!-- ===============================================================
-         PAGE: CHAT
+         PAGE: CHAT — Community
     ================================================================ -->
-    <section class="page" id="pg-chat" role="main" aria-label="Trader Community Chat" hidden>
+    <section class="page" id="pg-chat" role="main" aria-label="Trader Community" hidden>
 
       <!-- Lock Overlay -->
-      <div class="lock" id="lock-chat" role="alertdialog" aria-label="Access locked">
+      <div class="lock" id="lock-chat" role="alertdialog">
         <span class="lock-ico" aria-hidden="true">🔒</span>
         <h2 class="lock-title">AKSES TERKUNCI</h2>
-        <p class="lock-desc">Login untuk bergabung<br>dengan komunitas trader SHELEN</p>
+        <p class="lock-desc">Login untuk bergabung<br>dengan komunitas trader SALC</p>
         <button class="btn btn-gold" onclick="openAuth()">LOGIN / DAFTAR</button>
       </div>
 
       <!-- Chat Content -->
       <div class="chat-content" id="cc-content" hidden>
 
-        <!-- Hall of Fame Leaderboard Strip -->
+        <!-- Hall of Fame Leaderboard -->
         <div class="leaderboard-strip" role="complementary" aria-label="Hall of Fame">
           <div class="lb-title">🏆 HALL OF FAME — TOP TRADER BULAN INI</div>
           <div class="lb-grid">
             <div class="lb-item">
               <span class="lb-rank" aria-hidden="true">🥇</span>
-              <div class="lb-avatar lb-avatar--gold">AP</div>
+              <div class="lb-avatar gold">AP</div>
               <div class="lb-info">
                 <span class="lb-name">AlphaTrader</span>
                 <span class="lb-stats"><span class="lb-wr">WR 87%</span> · +$4,280</span>
@@ -1058,7 +1455,7 @@
             </div>
             <div class="lb-item">
               <span class="lb-rank" aria-hidden="true">🥈</span>
-              <div class="lb-avatar lb-avatar--silver">QM</div>
+              <div class="lb-avatar silver">QM</div>
               <div class="lb-info">
                 <span class="lb-name">QuantMaster</span>
                 <span class="lb-stats"><span class="lb-wr">WR 81%</span> · +$3,150</span>
@@ -1066,7 +1463,7 @@
             </div>
             <div class="lb-item">
               <span class="lb-rank" aria-hidden="true">🥉</span>
-              <div class="lb-avatar lb-avatar--bronze">FX</div>
+              <div class="lb-avatar bronze">FK</div>
               <div class="lb-info">
                 <span class="lb-name">ForexKing</span>
                 <span class="lb-stats"><span class="lb-wr">WR 76%</span> · +$2,640</span>
@@ -1076,36 +1473,31 @@
         </div>
 
         <!-- Messages Area -->
-        <div class="chat-messages" id="chatMsgs" role="log" aria-live="polite" aria-label="Chat messages">
-          <!-- Dynamically populated by script.js -->
+        <div class="chat-messages" id="chatMsgs" role="log" aria-live="polite">
+          <!-- Populated by script.js -->
         </div>
 
-        <!-- Reply Preview (injected by script.js when reply initiated) -->
-        <!-- <div class="reply-preview" id="chatReplyPreview" hidden>...</div> -->
+        <!-- Emoji Bar -->
+        <div class="emoji-bar" id="emojiBar" role="toolbar" aria-label="Quick emoji">
+          <!-- Populated by script.js -->
+        </div>
 
-        <!-- Input Area -->
+        <!-- Input Row -->
         <div class="chat-input-wrap" id="chatInputWrap">
-          <!-- Emoji Bar -->
-          <div class="emoji-bar" id="emojiBar" role="toolbar" aria-label="Emoji picker">
-            <!-- Dynamically populated by script.js -->
-          </div>
-          <!-- Input Row -->
           <div class="chat-row">
             <button class="chat-img-btn" onclick="document.getElementById('imgInput').click()" aria-label="Send image">📷</button>
             <input type="file" id="imgInput" accept="image/*" style="display:none;" onchange="sendImage(this)" />
-
             <textarea
               class="chat-inp"
               id="chatInput"
-              placeholder="Ketik pesan ke komunitas…"
+              placeholder="Ketik pesan ke komunitas SALC…"
               rows="1"
               aria-label="Message input"
               onkeydown="handleChatKey(event)"
               oninput="autoResizeChatInput(this)"
             ></textarea>
-
-            <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" aria-label="Record voice note">🎙</button>
-            <button class="chat-send-btn" onclick="sendMsg()" aria-label="Send message">➤</button>
+            <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" aria-label="Voice note">🎙</button>
+            <button class="chat-send-btn" onclick="sendMsg()" aria-label="Send">➤</button>
           </div>
         </div>
 
@@ -1114,183 +1506,102 @@
 
 
     <!-- ===============================================================
-         PAGE: HUB (Minigame + Affiliate)
-    ================================================================ -->
-    <section class="page" id="pg-hub" role="main" aria-label="The Hub" hidden>
-
-      <!-- Game Section -->
-      <div class="hub-content">
-
-        <header class="hub-game-header">
-          <h2 class="hub-game-title">🎮 THE ALCHEMIST CANDLE</h2>
-          <p class="hub-game-sub">Dodge bearish candles · Collect gold · Trade like machines</p>
-        </header>
-
-        <div class="game-score-row" role="list">
-          <div class="mc" role="listitem">
-            <div class="mc-label">SCORE</div>
-            <div class="mc-value mc-value--gold" id="gameScore">0</div>
-          </div>
-          <div class="mc" role="listitem">
-            <div class="mc-label">HIGH SCORE</div>
-            <div class="mc-value mc-value--gold" id="gameHigh">0</div>
-          </div>
-        </div>
-
-        <!-- Game Canvas Wrapper -->
-        <div class="game-canvas-wrap">
-          <canvas
-            id="gameCanvas"
-            width="360"
-            height="220"
-            aria-label="Alchemist Candle game"
-            role="img"
-          ></canvas>
-
-          <!-- Start Overlay -->
-          <div class="game-overlay" id="gameOverlay">
-            <h3 class="game-overlay-title">THE ALCHEMIST CANDLE</h3>
-            <p class="game-overlay-hint">Tap · Spacebar · Swipe UP to jump<br>Avoid the red bearish candles</p>
-            <button class="btn btn-gold" onclick="startGame()">▶ START GAME</button>
-          </div>
-
-          <!-- Game Over Screen -->
-          <div class="game-over-screen" id="gameOverScreen" hidden>
-            <span class="game-over-label">GAME OVER</span>
-            <p class="game-over-msg" id="gameOverMsg"></p>
-            <span class="game-over-score" id="gameOverScore"></span>
-            <button class="btn btn-gold2" onclick="restartGame()">↺ RESTART</button>
-          </div>
-
-        </div><!-- /.game-canvas-wrap -->
-
-        <p class="game-controls-hint">TAP CANVAS · SPACEBAR · SWIPE UP to JUMP</p>
-
-        <!-- Broker Partner Block -->
-        <section class="hub-broker" aria-label="Broker Partners">
-          <div class="section-divider">
-            <span class="section-divider-label">AKTIVASI PREMIUM GRATIS</span>
-          </div>
-          <div class="broker-card card">
-            <p class="broker-headline">🎁 DAFTAR VIA BROKER PARTNER — DAPAT PREMIUM GRATIS SEUMUR HIDUP</p>
-            <p class="broker-desc">
-              Daftar di salah satu broker via link Nizar → deposit → kirim nomor akun ke WhatsApp Admin
-              untuk aktivasi PREMIUM seumur hidup.
-            </p>
-            <div class="broker-btn-col">
-              <a
-                href="https://www.hfmtrade-ind.com/sv/en/?refid=30517682"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-gold2"
-              >🏦 HFM — Cocok Buat Modal Kecil →</a>
-              <a
-                href="https://one.exnessonelink.com/a/4qa0vqh2p9?source=app&platform=mobile&pid=mobile_share"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-cyan"
-              >⚡ EXNESS — Terbaik Instant Withdraw →</a>
-              <a
-                href="https://wa.me/62895338203376?text=Halo+Admin+SHELEN%2C+saya+sudah+daftar+dan+deposit+via+broker+partner.+Nomor+akun+saya%3A+"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-green"
-              >💬 Kirim Nomor Akun ke Admin WA →</a>
-            </div>
-          </div>
-        </section>
-
-        <div class="page-bottom-spacer"></div>
-
-      </div><!-- /.hub-content -->
-    </section><!-- /#pg-hub -->
-
-
-    <!-- ===============================================================
-         PAGE: PRICING
+         PAGE: PRICING — Plans
     ================================================================ -->
     <section class="page" id="pg-pricing" role="main" aria-label="Pricing Plans" hidden>
 
-      <!-- Page Header -->
+      <!-- Hero -->
       <div class="pricing-hero">
-        <div class="pricing-eyebrow">SHELEN PRECISION ENGINE</div>
-        <h2 class="pricing-title">PILIH <span class="pricing-title-gold">PLAN</span><br>KAMU</h2>
-        <p class="pricing-sub">Mulai gratis, upgrade kapan saja · Tanpa kontrak</p>
+        <div class="pricing-eyebrow">SALC EXPERT ADVISOR TERMINAL v14</div>
+        <h2 class="pricing-title">
+          PILIH <span class="pricing-title-gold">PLAN</span><br>KAMU
+        </h2>
+        <p class="pricing-sub">
+          Mulai gratis, upgrade kapan saja · Tanpa kontrak<br>
+          Transfer ke: BCA <strong>1234567890</strong> / DANA-OVO-GOPAY <strong>085839053130</strong> a.n. Nizar
+        </p>
       </div>
 
       <!-- Tier Cards -->
       <div class="tiers-container">
 
         <!-- FREE -->
-        <div class="tier-card tier-card--free" id="tc-free" onclick="chooseTier('free')" role="button" tabindex="0" aria-label="Free plan">
+        <div class="tier-card tier-card--free" id="tc-free"
+             onclick="chooseTier('free')" role="button" tabindex="0">
           <div class="tier-current-badge" id="badge-free">✓ AKTIF</div>
           <div class="tier-inner">
-            <div class="tier-name tier-name--free">FREE</div>
+            <div class="tier-name free">FREE</div>
             <div class="tier-price">$0</div>
-            <div class="tier-period">/bulan · selamanya</div>
-            <p class="tier-pitch">Coba SHELEN tanpa biaya. Akses fitur dasar dengan 5 signal per hari.</p>
+            <div class="tier-period">/bulan · selamanya gratis</div>
+            <p class="tier-pitch">Coba SALC tanpa biaya. Akses fitur dasar dengan 3 signal per hari.</p>
             <div class="tier-divider"></div>
             <ul class="tier-perks" role="list">
-              <li class="perk perk--on"><span class="perk-ico">✅</span> 5 AI Signal per hari</li>
-              <li class="perk perk--on"><span class="perk-ico">✅</span> Chart TradingView Realtime</li>
-              <li class="perk perk--on"><span class="perk-ico">✅</span> Trade Journal (basic)</li>
-              <li class="perk perk--on"><span class="perk-ico">✅</span> MT5 Bridge (basic)</li>
-              <li class="perk perk--off"><span class="perk-ico">❌</span> AI Photo Analysis</li>
-              <li class="perk perk--off"><span class="perk-ico">❌</span> Bloomberg News</li>
-              <li class="perk perk--off"><span class="perk-ico">❌</span> Orderbook DOM</li>
+              <li class="perk on"><span class="perk-ico">✅</span> 3 AI Signal per hari</li>
+              <li class="perk on"><span class="perk-ico">✅</span> Chart TradingView Realtime</li>
+              <li class="perk on"><span class="perk-ico">✅</span> Trade Journal (basic)</li>
+              <li class="perk on"><span class="perk-ico">✅</span> Zero-delay price ticker</li>
+              <li class="perk off"><span class="perk-ico">❌</span> AI Photo Analysis (Claude)</li>
+              <li class="perk off"><span class="perk-ico">❌</span> Bloomberg News</li>
+              <li class="perk off"><span class="perk-ico">❌</span> Orderbook DOM</li>
+              <li class="perk off"><span class="perk-ico">❌</span> AI Deep Reasoning</li>
             </ul>
-            <button class="tier-btn tier-btn--free" onclick="chooseTier('free'); event.stopPropagation()">
+            <button class="tier-btn tier-btn--free"
+                    onclick="chooseTier('free'); event.stopPropagation()">
               MULAI GRATIS →
             </button>
           </div>
         </div>
 
         <!-- MEDIUM -->
-        <div class="tier-card tier-card--med" id="tc-medium" onclick="openPayModal('medium')" role="button" tabindex="0" aria-label="Medium plan $6/month">
+        <div class="tier-card tier-card--med" id="tc-medium"
+             onclick="openPayModal('medium')" role="button" tabindex="0">
           <div class="tier-current-badge" id="badge-medium">✓ AKTIF</div>
           <div class="tier-inner">
-            <div class="tier-name tier-name--med">MEDIUM</div>
+            <div class="tier-name med">MEDIUM</div>
             <div class="tier-price">$6</div>
-            <div class="tier-period">/bulan · hemat 40% annual</div>
+            <div class="tier-period">/bulan · ~Rp 90.000</div>
             <p class="tier-pitch">Untuk trader aktif. 50 signal per hari + analisa AI mendalam setiap sesi.</p>
             <div class="tier-divider"></div>
             <ul class="tier-perks" role="list">
-              <li class="perk perk--on"><span class="perk-ico">⚡</span> 50 AI Signal per hari <span class="perk-note">10× lebih banyak dari Free</span></li>
-              <li class="perk perk--on"><span class="perk-ico">📷</span> AI Photo Chart Analysis <span class="perk-note gold">Upload chart → AI baca full setup</span></li>
-              <li class="perk perk--on"><span class="perk-ico">🧠</span> AI Deep Reasoning <span class="perk-note gold">Alchemist v8 — Full analysis text</span></li>
-              <li class="perk perk--on"><span class="perk-ico">📰</span> Bloomberg News + Calendar</li>
-              <li class="perk perk--on"><span class="perk-ico">📊</span> Orderbook DOM Visualizer</li>
-              <li class="perk perk--on"><span class="perk-ico">💱</span> Currency Strength Meter</li>
-              <li class="perk perk--off"><span class="perk-ico">❌</span> Signal Unlimited</li>
-              <li class="perk perk--off"><span class="perk-ico">❌</span> Priority Support Nizar</li>
+              <li class="perk on"><span class="perk-ico">⚡</span> 50 AI Signal per hari <span class="perk-note">17× lebih dari Free</span></li>
+              <li class="perk on"><span class="perk-ico">📷</span> AI Photo Chart Analysis <span class="perk-note gold">Claude AI baca full setup</span></li>
+              <li class="perk on"><span class="perk-ico">🧠</span> AI Deep Reasoning <span class="perk-note gold">Alchemist v9 full analysis</span></li>
+              <li class="perk on"><span class="perk-ico">📰</span> Bloomberg News + Calendar</li>
+              <li class="perk on"><span class="perk-ico">📊</span> Orderbook DOM Visualizer</li>
+              <li class="perk on"><span class="perk-ico">💱</span> Currency Strength Meter</li>
+              <li class="perk off"><span class="perk-ico">❌</span> Signal Unlimited</li>
+              <li class="perk off"><span class="perk-ico">❌</span> Swing Mode + Priority Support</li>
             </ul>
-            <button class="tier-btn tier-btn--med" onclick="openPayModal('medium'); event.stopPropagation()">
-              PILIH MEDIUM →
+            <button class="tier-btn tier-btn--med"
+                    onclick="openPayModal('medium'); event.stopPropagation()">
+              PILIH MEDIUM → Rp 90.000
             </button>
           </div>
         </div>
 
         <!-- PREMIUM -->
-        <div class="tier-card tier-card--pro" id="tc-premium" onclick="openPayModal('premium')" role="button" tabindex="0" aria-label="Premium plan $20/month">
+        <div class="tier-card tier-card--pro" id="tc-premium"
+             onclick="openPayModal('premium')" role="button" tabindex="0">
           <div class="tier-popular-badge">🔥 TERPOPULER</div>
           <div class="tier-current-badge" id="badge-premium">✓ AKTIF</div>
           <div class="tier-inner">
-            <div class="tier-name tier-name--pro">PREMIUM</div>
+            <div class="tier-name pro">PREMIUM</div>
             <div class="tier-price">$20</div>
-            <div class="tier-period">/bulan · semua fitur tanpa batas</div>
-            <p class="tier-pitch">Untuk trader serius. Maximum edge. Zero compromise. Full arsenal aktif 24/7.</p>
+            <div class="tier-period">/bulan · ~Rp 300.000</div>
+            <p class="tier-pitch">Untuk trader serius. Maximum edge. Zero compromise. Full arsenal 24/7.</p>
             <div class="tier-divider"></div>
             <ul class="tier-perks" role="list">
-              <li class="perk perk--on"><span class="perk-ico">♾️</span> Signal UNLIMITED setiap hari <span class="perk-note gold">Scan sebanyak yang kamu mau</span></li>
-              <li class="perk perk--on"><span class="perk-ico">🤖</span> AI Photo Analysis — No Limit <span class="perk-note gold">ICT+SMC+Alchemist full confluence</span></li>
-              <li class="perk perk--on"><span class="perk-ico">🏆</span> Full Confluence Engine <span class="perk-note gold">Scalp + Intraday + Swing</span></li>
-              <li class="perk perk--on"><span class="perk-ico">📈</span> Advanced Portfolio Analytics <span class="perk-note gold">DD meter · P&amp;L heatmap · Partial close</span></li>
-              <li class="perk perk--on"><span class="perk-ico">🔊</span> Voice Alert + Auto Journal Log <span class="perk-note gold">Signal otomatis masuk journal</span></li>
-              <li class="perk perk--on"><span class="perk-ico">👑</span> Hall of Fame Priority Rank</li>
-              <li class="perk perk--on"><span class="perk-ico">💬</span> Priority Support dari Nizar <span class="perk-note gold">Respons 1×24 jam — WA</span></li>
+              <li class="perk on"><span class="perk-ico">♾️</span> Signal UNLIMITED setiap hari <span class="perk-note gold">Scan kapan saja</span></li>
+              <li class="perk on"><span class="perk-ico">🤖</span> AI Photo Analysis — No Limit <span class="perk-note gold">ICT+Alchemist+MSNR full</span></li>
+              <li class="perk on"><span class="perk-ico">🏆</span> Full Confluence Engine <span class="perk-note gold">Scalp + Intraday + Swing</span></li>
+              <li class="perk on"><span class="perk-ico">📈</span> Advanced Portfolio Analytics <span class="perk-note gold">DD · Heatmap · Partial close</span></li>
+              <li class="perk on"><span class="perk-ico">🔊</span> Voice Alert "SIKAT!!!" <span class="perk-note gold">Auto journal log signal</span></li>
+              <li class="perk on"><span class="perk-ico">👑</span> Hall of Fame Priority Rank</li>
+              <li class="perk on"><span class="perk-ico">💬</span> Priority Support Nizar <span class="perk-note gold">Respons 1×24 jam WA</span></li>
             </ul>
-            <button class="tier-btn tier-btn--pro" onclick="openPayModal('premium'); event.stopPropagation()">
-              UPGRADE PREMIUM ⚡
+            <button class="tier-btn tier-btn--pro"
+                    onclick="openPayModal('premium'); event.stopPropagation()">
+              UPGRADE PREMIUM ⚡ Rp 300.000
             </button>
           </div>
         </div>
@@ -1302,17 +1613,57 @@
         <div class="cmp-header" role="row">
           <div class="cmp-cell cmp-feat-col" role="columnheader">FITUR</div>
           <div class="cmp-cell" role="columnheader" style="color:var(--green)">FREE</div>
-          <div class="cmp-cell" role="columnheader" style="color:var(--cyan)">MED</div>
-          <div class="cmp-cell" role="columnheader" style="color:var(--gold2)">PRO</div>
+          <div class="cmp-cell" role="columnheader" style="color:var(--cyan)">MEDIUM</div>
+          <div class="cmp-cell" role="columnheader" style="color:var(--gold2)">PREMIUM</div>
         </div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">AI Signal / Hari</div><div class="cmp-cell cmp-pill">5</div><div class="cmp-cell cmp-pill">50</div><div class="cmp-cell cmp-yes">∞</div></div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">Photo AI Analysis</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-yes">✓</div><div class="cmp-cell cmp-yes">✓</div></div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">Bloomberg News</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-yes">✓</div><div class="cmp-cell cmp-yes">✓</div></div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">Orderbook DOM</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-yes">✓</div><div class="cmp-cell cmp-yes">✓</div></div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">MT5 Bridge Full</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-yes">✓</div><div class="cmp-cell cmp-yes">✓</div></div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">Swing Trading Mode</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-yes">✓</div></div>
-        <div class="cmp-row" role="row"><div class="cmp-cell cmp-feat-col">Priority Support</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-no">✗</div><div class="cmp-cell cmp-yes">✓</div></div>
-        <div class="cmp-row cmp-row--last" role="row"><div class="cmp-cell cmp-feat-col">Harga / Bulan</div><div class="cmp-cell cmp-pill">FREE</div><div class="cmp-cell cmp-pill">$6</div><div class="cmp-cell cmp-pill">$20</div></div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">AI Signal / Hari</div>
+          <div class="cmp-cell cmp-pill">3</div>
+          <div class="cmp-cell cmp-pill">50</div>
+          <div class="cmp-cell cmp-yes">∞</div>
+        </div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">Photo AI (Claude)</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+        </div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">AI Deep Reasoning</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+        </div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">Bloomberg News</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+        </div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">Orderbook DOM</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+        </div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">Swing Trading</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+        </div>
+        <div class="cmp-row" role="row">
+          <div class="cmp-cell cmp-feat-col">Priority Support</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-no">✗</div>
+          <div class="cmp-cell cmp-yes">✓</div>
+        </div>
+        <div class="cmp-row cmp-row--last" role="row">
+          <div class="cmp-cell cmp-feat-col">Harga / Bulan</div>
+          <div class="cmp-cell cmp-pill">FREE</div>
+          <div class="cmp-cell cmp-pill">$6</div>
+          <div class="cmp-cell cmp-pill">$20</div>
+        </div>
       </div>
 
       <div class="page-bottom-spacer"></div>
@@ -1327,180 +1678,407 @@
        BOTTOM NAVIGATION BAR
   ================================================================== -->
   <nav class="botnav" role="navigation" aria-label="Primary navigation">
-    <button class="bn bn--active" id="bn-home"     onclick="goPage('home')"     aria-label="Home"     aria-current="page">
+    <button class="bn bn--active" id="bn-home"     onclick="goPage('home')"     aria-label="Home" aria-current="page">
       <span class="bn-icon" aria-hidden="true">🏠</span>
       <span class="bn-label">HOME</span>
     </button>
-    <button class="bn" id="bn-terminal"            onclick="goPage('terminal')" aria-label="Signal Terminal">
+    <button class="bn" id="bn-terminal" onclick="goPage('terminal')" aria-label="Signal Terminal">
       <span class="bn-icon" aria-hidden="true">⚡</span>
       <span class="bn-label">SIGNAL</span>
     </button>
-    <button class="bn" id="bn-news"                onclick="goPage('news')"     aria-label="Financial News">
+    <button class="bn" id="bn-news"     onclick="goPage('news')"     aria-label="Financial News">
       <span class="bn-icon" aria-hidden="true">📰</span>
       <span class="bn-label">NEWS</span>
     </button>
-    <button class="bn" id="bn-journal"             onclick="goPage('journal')"  aria-label="Trade Journal">
+    <button class="bn" id="bn-journal"  onclick="goPage('journal')"  aria-label="Trade Journal">
       <span class="bn-icon" aria-hidden="true">📓</span>
       <span class="bn-label">JOURNAL</span>
     </button>
-    <button class="bn" id="bn-chat"                onclick="goPage('chat')"     aria-label="Community Chat">
+    <button class="bn" id="bn-chat"     onclick="goPage('chat')"     aria-label="Community">
       <span class="bn-icon" aria-hidden="true">💬</span>
       <span class="bn-label">CHAT</span>
     </button>
-    <button class="bn" id="bn-hub"                 onclick="goPage('hub')"      aria-label="The Hub">
-      <span class="bn-icon" aria-hidden="true">🎮</span>
-      <span class="bn-label">HUB</span>
-    </button>
-    <button class="bn" id="bn-pricing"             onclick="goPage('pricing')"  aria-label="Pricing Plans">
+    <button class="bn" id="bn-pricing"  onclick="goPage('pricing')"  aria-label="Pricing Plans">
       <span class="bn-icon" aria-hidden="true">💎</span>
       <span class="bn-label">PLANS</span>
     </button>
-  </nav><!-- /.botnav -->
+  </nav>
 
 </div><!-- /#app -->
 
 
 <!-- =====================================================================
-     MODAL: AUTH (Login / Register)
+     DRAWER BACKDROP
 ====================================================================== -->
-<div
-  class="modal-overlay auth-overlay"
-  id="authOverlay"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Authentication"
-  hidden
->
+<div class="dr-backdrop" id="drBackdrop" onclick="closeDrawer()" aria-hidden="true"></div>
+
+<!-- =====================================================================
+     HAMBURGER DRAWER — Full Settings Panel
+====================================================================== -->
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Settings & Profile" hidden>
+  <div class="drawer-inner">
+
+    <!-- Drawer Header: User Profile -->
+    <div class="dr-header">
+      <button class="dr-close-btn" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+      <div class="dr-avatar" id="drAvatar" aria-hidden="true">NN</div>
+      <div class="dr-user-info">
+        <div class="dr-user-name" id="drUserName">Nizar Nurkhalik</div>
+        <div class="dr-user-handle" id="drUserHandle">@svenjunee · @svenjuneee</div>
+      </div>
+      <div class="dr-plan-badge" id="drPlanBadge">PREMIUM</div>
+    </div>
+
+    <!-- Drawer Metrics: Account Stats -->
+    <div class="dr-metrics-grid">
+      <div class="dr-metric">
+        <span class="dr-metric-l">BALANCE</span>
+        <span class="dr-metric-v gold" id="drBalance">—</span>
+      </div>
+      <div class="dr-metric">
+        <span class="dr-metric-l">EQUITY</span>
+        <span class="dr-metric-v" id="drEquity">—</span>
+      </div>
+      <div class="dr-metric">
+        <span class="dr-metric-l">FLOAT P&L</span>
+        <span class="dr-metric-v" id="drFloat">—</span>
+      </div>
+      <div class="dr-metric">
+        <span class="dr-metric-l">FREE MARGIN</span>
+        <span class="dr-metric-v green" id="drMargin">—</span>
+      </div>
+    </div>
+
+    <!-- Drawer Navigation Links -->
+    <nav class="dr-nav" role="navigation" aria-label="Drawer navigation">
+      <button class="dr-nav-item active" onclick="goPage('home'); closeDrawer()">
+        <span class="dr-nav-ico" aria-hidden="true">🏠</span>
+        <span class="dr-nav-label">Dashboard</span>
+      </button>
+      <button class="dr-nav-item" onclick="goPage('terminal'); closeDrawer()">
+        <span class="dr-nav-ico" aria-hidden="true">⚡</span>
+        <span class="dr-nav-label">Signal Terminal</span>
+      </button>
+      <button class="dr-nav-item" onclick="goPage('news'); closeDrawer()">
+        <span class="dr-nav-ico" aria-hidden="true">📰</span>
+        <span class="dr-nav-label">Bloomberg News</span>
+      </button>
+      <button class="dr-nav-item" onclick="goPage('journal'); closeDrawer()">
+        <span class="dr-nav-ico" aria-hidden="true">📓</span>
+        <span class="dr-nav-label">Trade Journal</span>
+      </button>
+      <button class="dr-nav-item" onclick="goPage('chat'); closeDrawer()">
+        <span class="dr-nav-ico" aria-hidden="true">💬</span>
+        <span class="dr-nav-label">Community</span>
+      </button>
+      <button class="dr-nav-item" onclick="goPage('pricing'); closeDrawer()">
+        <span class="dr-nav-ico" aria-hidden="true">💎</span>
+        <span class="dr-nav-label">Upgrade Plan</span>
+      </button>
+    </nav>
+
+    <!-- ──── SETTINGS SECTIONS ──── -->
+    <div class="dr-settings">
+
+      <!-- TAMPILAN -->
+      <div class="dr-section">
+        <button class="dr-section-hd" onclick="toggleDrSection(this)" aria-expanded="false">
+          <span>TAMPILAN</span>
+          <span class="dr-section-arr" aria-hidden="true">▾</span>
+        </button>
+        <div class="dr-section-body" hidden>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Tema</span>
+            <div class="theme-pills" role="group">
+              <button class="theme-pill active" id="tp-dark"  onclick="setTheme('dark')" >🌙 Dark</button>
+              <button class="theme-pill"        id="tp-light" onclick="setTheme('light')">☀️ Light</button>
+              <button class="theme-pill"        id="tp-oled"  onclick="setTheme('oled')" >⬛ OLED</button>
+            </div>
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Accent Color</span>
+            <input type="color" class="color-picker" value="#E8B831"
+                   oninput="changeAccentColor(this.value)" aria-label="Accent color" />
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">CRT Scanlines</span>
+            <div class="toggle-wrap">
+              <button class="toggle" id="crtToggle" role="switch" aria-checked="false"
+                      onclick="toggleScanlines()" aria-label="CRT scanlines"></button>
+              <span class="toggle-label" id="crtToggleLabel">OFF</span>
+            </div>
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Killzone Clock</span>
+            <div class="toggle-wrap">
+              <button class="toggle toggle--on" id="kzToggle" role="switch" aria-checked="true"
+                      onclick="toggleKZWidget()" aria-label="Killzone clock"></button>
+              <span class="toggle-label" id="kzToggleLabel">ON</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KONEKSI LIVE -->
+      <div class="dr-section">
+        <button class="dr-section-hd" onclick="toggleDrSection(this)" aria-expanded="false">
+          <span>KONEKSI LIVE</span>
+          <span class="dr-section-arr" aria-hidden="true">▾</span>
+        </button>
+        <div class="dr-section-body" hidden>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Status Feed</span>
+            <span class="dr-srow-value" id="drFeedStatus" style="color:var(--red)">NO FEED</span>
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Engine Mode</span>
+            <span class="dr-srow-value" id="drEngineMode">—</span>
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">TwelveData API Key</label>
+            <input type="text" class="field" id="drTdKey"
+                   placeholder="API key (kosong = demo, limited)"
+                   onchange="saveTdKey(this.value)" />
+            <p class="dr-hint">Daftar gratis di twelvedata.com untuk unlock XAUUSD + forex live feed</p>
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">MT5 Bridge URL</label>
+            <input type="text" class="field" id="drMT5Url"
+                   placeholder="ws://localhost:8080"
+                   value="ws://localhost:8080" />
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="reconnectFromDrawer()">↺ RECONNECT FEED</button>
+        </div>
+      </div>
+
+      <!-- NOTIFIKASI -->
+      <div class="dr-section">
+        <button class="dr-section-hd" onclick="toggleDrSection(this)" aria-expanded="false">
+          <span>NOTIFIKASI</span>
+          <span class="dr-section-arr" aria-hidden="true">▾</span>
+        </button>
+        <div class="dr-section-body" hidden>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Voice Alert ("SIKAT!!!")</span>
+            <div class="toggle-wrap">
+              <button class="toggle toggle--on" id="voiceAlertToggle" role="switch" aria-checked="true"
+                      onclick="toggleVoiceAlert()" aria-label="Voice alert"></button>
+              <span class="toggle-label" id="voiceAlertLabel">ON</span>
+            </div>
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Price Flash Animation</span>
+            <div class="toggle-wrap">
+              <button class="toggle toggle--on" id="priceFlashToggle" role="switch" aria-checked="true"
+                      onclick="togglePriceFlash()" aria-label="Price flash"></button>
+              <span class="toggle-label" id="priceFlashLabel">ON</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RISK MANAGEMENT -->
+      <div class="dr-section">
+        <button class="dr-section-hd" onclick="toggleDrSection(this)" aria-expanded="false">
+          <span>RISK MANAGEMENT</span>
+          <span class="dr-section-arr" aria-hidden="true">▾</span>
+        </button>
+        <div class="dr-section-body" hidden>
+          <div class="dr-form-group">
+            <label class="flabel">Max Spread (pips)</label>
+            <input type="number" class="field" id="drMaxSpread" value="30" min="1" max="100" />
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">Default Volume (lots)</label>
+            <input type="number" class="field" id="drDefVol" value="0.01" min="0.01" step="0.01" />
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">Max Daily DD (%)</label>
+            <input type="number" class="field" id="drMaxDD" value="5" min="1" max="20" />
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">Risk Per Trade (%)</label>
+            <input type="number" class="field" id="drRiskPT" value="1" min="0.5" max="5" step="0.5" />
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="saveRiskSettings()">SIMPAN RISK SETTINGS</button>
+        </div>
+      </div>
+
+      <!-- AKUN & PASSWORD -->
+      <div class="dr-section">
+        <button class="dr-section-hd" onclick="toggleDrSection(this)" aria-expanded="false">
+          <span>AKUN &amp; PASSWORD</span>
+          <span class="dr-section-arr" aria-hidden="true">▾</span>
+        </button>
+        <div class="dr-section-body" hidden>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Status Akun</span>
+            <span class="dr-srow-value green" id="drAccStatus">GUEST</span>
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Plan Aktif</span>
+            <span class="dr-srow-value gold" id="drPlanStatus">FREE</span>
+          </div>
+          <div class="dr-srow">
+            <span class="dr-srow-label">Signal Hari Ini</span>
+            <span class="dr-srow-value" id="drSigCount">0 / 3</span>
+          </div>
+          <div class="dr-divider"></div>
+          <div class="dr-form-group">
+            <label class="flabel">PASSWORD LAMA</label>
+            <input type="password" class="field" id="drPassOld" placeholder="••••••••" />
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">PASSWORD BARU</label>
+            <input type="password" class="field" id="drPassNew" placeholder="Min 8 karakter"
+                   oninput="checkPasswordStrength(this.value)" />
+            <div class="pw-strength-bar">
+              <div class="pw-strength-fill" id="pwStrengthFill"></div>
+            </div>
+          </div>
+          <div class="dr-form-group">
+            <label class="flabel">KONFIRMASI PASSWORD</label>
+            <input type="password" class="field" id="drPassConfirm" placeholder="Ulangi password baru" />
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="changePassword()">GANTI PASSWORD</button>
+          <div class="dr-divider"></div>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('pricing'); closeDrawer()">
+            💎 UPGRADE PLAN →
+          </button>
+        </div>
+      </div>
+
+      <!-- TENTANG SALC -->
+      <div class="dr-section">
+        <button class="dr-section-hd" onclick="toggleDrSection(this)" aria-expanded="false">
+          <span>TENTANG SALC</span>
+          <span class="dr-section-arr" aria-hidden="true">▾</span>
+        </button>
+        <div class="dr-section-body" hidden>
+          <div class="dr-srow"><span class="dr-srow-label">Versi Terminal</span><span class="dr-srow-value">SALC v14.0</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">AI Engine</span><span class="dr-srow-value">Alchemist v9</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">Data Source</span><span class="dr-srow-value" id="drDataSrc">Binance + TwelveData</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">MT5 Bridge</span><span class="dr-srow-value" id="drMT5Url2">ws://localhost:8080</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">Founder</span><span class="dr-srow-value">Nizar Nurkhalik</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">Instagram</span><span class="dr-srow-value">@svenjunee</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">TikTok</span><span class="dr-srow-value">@svenjuneee</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">WhatsApp</span><span class="dr-srow-value">085839053130</span></div>
+          <div class="dr-srow"><span class="dr-srow-label">Kontak Admin</span>
+            <a href="https://wa.me/6285839053130" target="_blank" class="dr-srow-value gold" style="text-decoration:none;">wa.me/6285839053130</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.dr-settings -->
+
+    <!-- Drawer Footer -->
+    <div class="dr-footer">
+      <button class="btn btn-red btn-sm" onclick="doLogout()">🚪 LOGOUT</button>
+    </div>
+
+  </div><!-- /.drawer-inner -->
+</aside><!-- /#drawer -->
+
+
+<!-- =====================================================================
+     MODAL: AUTH — Login / Register
+====================================================================== -->
+<div class="modal-overlay auth-overlay" id="authOverlay"
+     role="dialog" aria-modal="true" aria-label="Authentication" hidden>
   <div class="modal-sheet auth-sheet">
     <div class="modal-handle" aria-hidden="true"></div>
 
     <!-- Brand -->
-    <div class="auth-logo" aria-label="SHELEN">
-      <span class="auth-logo-she">SHE</span><span class="auth-logo-len">LEN</span>
+    <div class="auth-logo">
+      <svg class="auth-logo-eye" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="28" height="28" aria-hidden="true">
+        <ellipse cx="12" cy="12" rx="10" ry="6" fill="none" stroke="#E8B831" stroke-width="1.2"/>
+        <circle cx="12" cy="12" r="3.5" fill="#E8B831" opacity=".9"/>
+        <circle cx="12" cy="12" r="1.8" fill="#0a0500"/>
+      </svg>
+      <span class="auth-logo-sa">SA</span><span class="auth-logo-lc">LC</span>
     </div>
-    <p class="auth-tagline">PRECISION OVER NOISE · MT5 BRIDGE EDITION</p>
+    <p class="auth-tagline">EXPERT ADVISOR TERMINAL · INSTITUTIONAL INTELLIGENCE · ZERO LATENCY</p>
 
     <!-- Tabs -->
     <div class="auth-tabs" role="tablist">
-      <button
-        class="auth-tab auth-tab--active"
-        id="tabLogin"
-        role="tab"
-        aria-selected="true"
-        aria-controls="loginForm"
-        onclick="switchAuthTab('login')"
-      >MASUK</button>
-      <button
-        class="auth-tab"
-        id="tabReg"
-        role="tab"
-        aria-selected="false"
-        aria-controls="regForm"
-        onclick="switchAuthTab('reg')"
-      >DAFTAR</button>
+      <button class="auth-tab auth-tab--active" id="tabLogin" role="tab"
+              aria-selected="true" onclick="switchAuthTab('login')">MASUK</button>
+      <button class="auth-tab" id="tabReg" role="tab"
+              aria-selected="false" onclick="switchAuthTab('reg')">DAFTAR</button>
     </div>
 
     <!-- Login Form -->
-    <form class="auth-form auth-form--active" id="loginForm" role="tabpanel" onsubmit="event.preventDefault(); doLogin()">
+    <form class="auth-form auth-form--active" id="loginForm" role="tabpanel"
+          onsubmit="event.preventDefault(); doLogin()">
       <div class="form-group">
         <label class="flabel" for="lEmail">EMAIL</label>
-        <input
-          type="email"
-          class="field"
-          id="lEmail"
-          placeholder="email@kamu.com"
-          autocomplete="email"
-          inputmode="email"
-          required
-        />
+        <input type="email" class="field" id="lEmail"
+               placeholder="email@kamu.com" autocomplete="email" inputmode="email" required />
       </div>
       <div class="form-group">
         <label class="flabel" for="lPass">PASSWORD</label>
-        <input
-          type="password"
-          class="field"
-          id="lPass"
-          placeholder="••••••••"
-          autocomplete="current-password"
-          required
-        />
+        <input type="password" class="field" id="lPass"
+               placeholder="••••••••" autocomplete="current-password" required />
       </div>
-      <button type="submit" class="btn btn-gold">MASUK KE TERMINAL</button>
+      <button type="submit" class="btn btn-gold">⚡ MASUK KE EXPERT ADVISOR</button>
       <p class="auth-switch-text">
         Belum punya akun?
-        <button type="button" class="auth-switch-link" onclick="switchAuthTab('reg')">Daftar sekarang</button>
+        <button type="button" class="auth-switch-link" onclick="switchAuthTab('reg')">Daftar sekarang →</button>
       </p>
     </form>
 
     <!-- Register Form -->
-    <form class="auth-form" id="regForm" role="tabpanel" onsubmit="event.preventDefault(); doRegister()">
+    <form class="auth-form" id="regForm" role="tabpanel"
+          onsubmit="event.preventDefault(); doRegister()">
       <div class="form-group">
         <label class="flabel" for="rName">NAMA LENGKAP</label>
-        <input
-          type="text"
-          class="field"
-          id="rName"
-          placeholder="Nama Kamu"
-          autocomplete="name"
-          required
-        />
+        <input type="text" class="field" id="rName"
+               placeholder="Nama Trader Kamu" autocomplete="name" required />
       </div>
       <div class="auth-row">
         <div class="form-group">
           <label class="flabel" for="rEmail">EMAIL</label>
-          <input
-            type="email"
-            class="field"
-            id="rEmail"
-            placeholder="email@kamu.com"
-            autocomplete="email"
-            inputmode="email"
-            required
-          />
+          <input type="email" class="field" id="rEmail"
+                 placeholder="email@kamu.com" autocomplete="email" inputmode="email" required />
         </div>
         <div class="form-group">
           <label class="flabel" for="rPass">PASSWORD</label>
-          <input
-            type="password"
-            class="field"
-            id="rPass"
-            placeholder="Min 6 karakter"
-            autocomplete="new-password"
-            minlength="6"
-            required
-          />
+          <input type="password" class="field" id="rPass"
+                 placeholder="Min 8 karakter" autocomplete="new-password" minlength="8" required />
         </div>
       </div>
-
-      <!-- Plan Selector -->
+      <!-- Plan Picker -->
       <div class="form-group">
         <label class="flabel">PILIH PLAN AWAL</label>
-        <div class="plan-picker" role="radiogroup" aria-label="Initial plan selection">
-          <div class="plan-pill plan-pill--active" id="pp-free"    role="radio" aria-checked="true"  tabindex="0" onclick="selectRegPlan('free')" onkeydown="if(event.key==='Enter')selectRegPlan('free')">
+        <div class="plan-picker" role="radiogroup">
+          <div class="plan-pill plan-pill--active" id="pp-free" role="radio" aria-checked="true"
+               tabindex="0" onclick="selectRegPlan('free')" onkeydown="if(event.key==='Enter')selectRegPlan('free')">
             <span class="plan-pill-name">FREE</span>
             <span class="plan-pill-price">$0<span class="plan-pill-mo">/bln</span></span>
-            <span class="plan-pill-feat">5 signal/hari</span>
+            <span class="plan-pill-feat">3 signal/hari</span>
           </div>
-          <div class="plan-pill" id="pp-medium"  role="radio" aria-checked="false" tabindex="0" onclick="selectRegPlan('medium')" onkeydown="if(event.key==='Enter')selectRegPlan('medium')">
+          <div class="plan-pill" id="pp-medium" role="radio" aria-checked="false"
+               tabindex="0" onclick="selectRegPlan('medium')" onkeydown="if(event.key==='Enter')selectRegPlan('medium')">
             <span class="plan-pill-name">MEDIUM</span>
             <span class="plan-pill-price">$6<span class="plan-pill-mo">/bln</span></span>
             <span class="plan-pill-feat">50 signal/hari</span>
           </div>
-          <div class="plan-pill" id="pp-premium" role="radio" aria-checked="false" tabindex="0" onclick="selectRegPlan('premium')" onkeydown="if(event.key==='Enter')selectRegPlan('premium')">
+          <div class="plan-pill" id="pp-premium" role="radio" aria-checked="false"
+               tabindex="0" onclick="selectRegPlan('premium')" onkeydown="if(event.key==='Enter')selectRegPlan('premium')">
             <span class="plan-pill-name">PREMIUM</span>
             <span class="plan-pill-price">$20<span class="plan-pill-mo">/bln</span></span>
             <span class="plan-pill-feat">∞ signal</span>
           </div>
         </div>
       </div>
-
       <button type="submit" class="btn btn-gold">BUAT AKUN SEKARANG</button>
       <p class="auth-switch-text">
-        Dengan mendaftar kamu menyetujui
-        <button type="button" class="auth-switch-link" onclick="openTosModal()">Syarat &amp; Ketentuan</button>
+        Sudah punya akun?
+        <button type="button" class="auth-switch-link" onclick="switchAuthTab('login')">Masuk →</button>
       </p>
     </form>
 
+    <button class="modal-close-btn" onclick="closeAuth()" aria-label="Close">✕</button>
   </div>
 </div><!-- /#authOverlay -->
 
@@ -1508,147 +2086,140 @@
 <!-- =====================================================================
      MODAL: SYMBOL PICKER
 ====================================================================== -->
-<div
-  class="modal-overlay sym-modal-overlay"
-  id="symModal"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Select Instrument"
-  hidden
->
+<div class="modal-overlay sym-modal-overlay" id="symModal"
+     role="dialog" aria-modal="true" aria-label="Select Instrument" hidden>
   <div class="modal-sheet sym-sheet">
     <div class="modal-handle" aria-hidden="true"></div>
     <h3 class="modal-sheet-title">PILIH INSTRUMEN</h3>
-    <p class="modal-sheet-sub">Harga realtime dari MT5 Bridge</p>
+    <p class="modal-sheet-sub">Harga realtime dari live feed</p>
     <div class="sym-grid" id="symGrid" role="list">
-      <!-- Dynamically populated by script.js -->
+      <!-- Populated by script.js -->
     </div>
     <button class="btn btn-ghost" onclick="closeSymModal()">TUTUP</button>
   </div>
-</div><!-- /#symModal -->
+</div>
 
 
 <!-- =====================================================================
-     MODAL: MT5 BRIDGE CONFIGURATION
+     MODAL: DATA FEED / BRIDGE CONFIGURATION
 ====================================================================== -->
-<div
-  class="modal-overlay mt5-modal-overlay"
-  id="mt5Modal"
-  role="dialog"
-  aria-modal="true"
-  aria-label="MT5 Bridge Configuration"
-  hidden
->
-  <div class="modal-sheet mt5-sheet">
+<div class="modal-overlay bridge-modal-overlay" id="bridgeModal"
+     role="dialog" aria-modal="true" aria-label="Data Feed Configuration" hidden>
+  <div class="modal-sheet bridge-sheet">
     <div class="modal-handle" aria-hidden="true"></div>
-    <h3 class="mt5-modal-title">MT5 BRIDGE</h3>
-    <p class="mt5-modal-sub">WebSocket · Nol Delay · Langsung Dari Akun MT5</p>
+    <h3 class="bridge-modal-title">⚡ DUAL-ENGINE DATA FEED</h3>
+    <p class="bridge-modal-sub">Zero-Latency · Binance WSS + TwelveData + MT5 Bridge</p>
 
     <!-- Status Block -->
-    <div class="mt5-modal-status-block" id="mt5ModalStatusBlock">
-      <div class="mt5-modal-status-row">
-        <span class="mt5-status-dot" id="mt5ModalDot" data-state="disconnected"></span>
-        <span class="mt5-modal-status-txt" id="mt5ModalStatusTxt">TIDAK TERHUBUNG</span>
+    <div class="bridge-modal-status" id="bridgeModalStatus">
+      <div class="bridge-modal-status-row">
+        <span class="bridge-status-dot" id="bridgeModalDot" data-state="off"></span>
+        <span class="bridge-modal-status-txt" id="bridgeModalStatusTxt">NO FEED ACTIVE</span>
       </div>
-      <div class="mt5-modal-latency-row">
-        <span class="mt5-modal-latency-label">Latency</span>
-        <span class="mt5-modal-latency-val" id="mt5ModalLatency">—</span>
-      </div>
-    </div>
-
-    <!-- Bridge URL Input -->
-    <div class="form-group mt5-url-group">
-      <label class="flabel" for="mt5UrlInput">BRIDGE URL</label>
-      <div class="mt5-url-row">
-        <input
-          type="text"
-          class="field"
-          id="mt5UrlInput"
-          value="ws://localhost:8080"
-          placeholder="ws://localhost:8080"
-          autocomplete="off"
-          spellcheck="false"
-          inputmode="url"
-          aria-label="MT5 Bridge WebSocket URL"
-        />
-        <button class="btn btn-green btn-sm" onclick="MT5Bridge.connect()" aria-label="Connect">CONNECT</button>
+      <div class="bridge-modal-latency">
+        <span>Latency</span>
+        <span id="bridgeModalLatency">—</span>
       </div>
     </div>
 
-    <!-- Connection Actions -->
-    <div class="mt5-action-row">
-      <button class="btn btn-red btn-sm"   onclick="MT5Bridge.disconnect()" aria-label="Disconnect">⏹ DISCONNECT</button>
-      <button class="btn btn-ghost btn-sm" onclick="MT5Bridge.reconnect()"  aria-label="Reconnect">↺ RECONNECT</button>
+    <!-- Engine Mode Selection -->
+    <div class="bridge-mode-tabs" role="group" aria-label="Engine mode">
+      <button class="bridge-mode-tab" id="bmt-auto" onclick="setBridgeMode('auto', this)">
+        AUTO<br><small>Binance + TwelveData</small>
+      </button>
+      <button class="bridge-mode-tab" id="bmt-mt5" onclick="setBridgeMode('mt5', this)">
+        MT5<br><small>Custom Bridge</small>
+      </button>
+      <button class="bridge-mode-tab" id="bmt-sim" onclick="setBridgeMode('sim', this)">
+        SIM<br><small>Simulation</small>
+      </button>
     </div>
 
-    <!-- EA Setup Instructions -->
-    <div class="mt5-info-box">
-      <span class="mt5-info-title">📋 CARA SETUP EA BRIDGE</span>
-      <ol class="mt5-info-steps">
-        <li>Download EA <strong>"Shelen_Bridge.ex5"</strong> dari Admin via WA.</li>
+    <!-- MT5 URL Input (shown in MT5 mode) -->
+    <div class="form-group" id="bridgeMT5Group">
+      <label class="flabel" for="bridgeModalUrl">MT5 BRIDGE URL</label>
+      <div class="bridge-url-row">
+        <input type="text" class="field" id="bridgeModalUrl"
+               value="ws://localhost:8080" placeholder="ws://localhost:8080"
+               autocomplete="off" spellcheck="false" inputmode="url" />
+        <button class="btn btn-green btn-sm" onclick="connectFromModal()">CONNECT</button>
+      </div>
+    </div>
+
+    <!-- TwelveData API Key -->
+    <div class="form-group">
+      <label class="flabel">TWELVEDATA API KEY (untuk XAU/USD + Forex live)</label>
+      <input type="text" class="field" id="bridgeModalTdKey"
+             placeholder="Daftar gratis di twelvedata.com" />
+      <p class="bridge-hint">Key kosong = demo mode (terbatas). Daftar gratis untuk unlock full pairs.</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="bridge-action-row">
+      <button class="btn btn-red   btn-sm" onclick="disconnectEngine()">⏹ DISCONNECT</button>
+      <button class="btn btn-ghost btn-sm" onclick="reconnectEngine()">↺ RECONNECT</button>
+    </div>
+
+    <!-- EA Bridge Setup Instructions -->
+    <div class="bridge-info-box">
+      <div class="bridge-info-title">📋 CARA SETUP MT5 EA BRIDGE</div>
+      <ol class="bridge-info-steps">
+        <li>Download EA <strong>"SALC_Bridge.ex5"</strong> dari Admin via WA.</li>
         <li>Attach EA ke chart mana saja di MT5 (timeframe bebas).</li>
-        <li>Di Input Parameter EA: set <strong>Port = 8080</strong> (atau custom).</li>
-        <li>Allow WebSocket: <em>Tools → Options → Expert Advisors → Allow WebRequest</em>.</li>
-        <li>EA akan start server. Masukkan URL di atas dan klik <strong>CONNECT</strong>.</li>
+        <li>Set <strong>Port = 8080</strong> di Input Parameter EA.</li>
+        <li><em>Tools → Options → Expert Advisors → Allow WebRequest</em>.</li>
+        <li>EA start server → masukkan URL → CONNECT.</li>
       </ol>
-      <p class="mt5-info-note">
-        Payload format EA → Bridge:<br>
-        <code>{"type":"tick","symbol":"XAUUSD","bid":2345.12,"ask":2345.34,"spread":0.22}</code><br>
-        <code>{"type":"account","balance":10000,"equity":9820,"margin":180,"freeMargin":9640,"drawdown":1.8}</code><br>
-        <code>{"type":"positions","data":[{"ticket":123,"symbol":"XAUUSD","type":"buy","volume":0.1,"profit":34.5}]}</code>
+      <p class="bridge-info-note">
+        Payload JSON dari EA:<br>
+        <code>{"type":"tick","symbol":"XAUUSD","bid":3318.50,"ask":3318.70,"spread":0.20}</code><br>
+        <code>{"type":"account","balance":10000,"equity":9820,"margin":180,"freeMargin":9640,"drawdown":1.8}</code>
       </p>
     </div>
 
-    <!-- Subscribed Pairs -->
+    <!-- Subscribed Pairs Grid -->
     <div class="form-group">
-      <label class="flabel">SUBSCRIBED PAIRS</label>
-      <div class="mt5-pairs-grid" id="mt5PairsGrid">
-        <!-- Dynamically populated by script.js -->
+      <label class="flabel">SUBSCRIBED PAIRS (Live Ticks)</label>
+      <div class="bridge-pairs-grid" id="bridgePairsGrid">
+        <!-- Populated by script.js -->
       </div>
     </div>
 
-    <button class="btn btn-ghost" onclick="closeMT5Modal()">TUTUP</button>
-
+    <button class="btn btn-ghost" onclick="closeBridgeModal()">TUTUP</button>
   </div>
-</div><!-- /#mt5Modal -->
+</div>
 
 
 <!-- =====================================================================
      MODAL: PAYMENT
 ====================================================================== -->
-<div
-  class="modal-overlay pay-modal-overlay"
-  id="payModal"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Payment"
-  hidden
->
+<div class="modal-overlay pay-modal-overlay" id="payModal"
+     role="dialog" aria-modal="true" aria-label="Payment" hidden>
   <div class="modal-sheet pay-sheet">
     <div class="modal-handle" aria-hidden="true"></div>
 
     <div class="pay-plan-badge" id="payPlanBadge">💎 PREMIUM</div>
     <h3 class="pay-title">UPGRADE PLAN</h3>
-    <p class="pay-subtitle" id="payPlanName">Aktifkan akses penuh ke SHELEN Terminal</p>
+    <p class="pay-subtitle" id="payPlanName">Aktifkan akses penuh ke SALC Expert Advisor</p>
 
-    <!-- QRIS -->
-    <div class="qris-wrap">
-      <div class="qris-placeholder" aria-label="QRIS Payment Code">
-        <span class="qris-ico" aria-hidden="true">📱</span>
-        <span class="qris-text">QRIS — Nizar Nurkhalik</span>
+    <!-- Bank Transfer -->
+    <div class="pay-transfer-box">
+      <div class="pay-transfer-row">
+        <span class="pay-transfer-bank">🏦 BCA</span>
+        <span class="pay-transfer-num">1234567890</span>
       </div>
-      <p class="qris-caption">SCAN QR · TRANSFER SESUAI NOMINAL UNIK</p>
+      <div class="pay-transfer-row">
+        <span class="pay-transfer-bank">📱 DANA/OVO/GOPAY</span>
+        <span class="pay-transfer-num">085839053130</span>
+      </div>
+      <p class="pay-transfer-name">a.n. Nizar Nurkhalik</p>
     </div>
 
-    <!-- Amount Breakdown -->
+    <!-- Amount -->
     <div class="pay-amounts">
       <div class="pay-amount-row">
         <span>Harga Plan</span>
         <span id="payBaseAmt">—</span>
-      </div>
-      <div class="pay-amount-row">
-        <span>Kode Unik</span>
-        <span id="payCodeAmt" class="pay-code-amt">—</span>
       </div>
       <div class="pay-amount-row pay-amount-row--total">
         <span>TOTAL TRANSFER</span>
@@ -1656,163 +2227,70 @@
       </div>
     </div>
 
-    <!-- Unique Code Note -->
-    <div class="pay-unique-note">
-      <strong>⚠️ NOMINAL UNIK — WAJIB TEPAT</strong><br>
-      Transfer HARUS tepat sesuai nominal di atas (termasuk kode unik).
-      Kode unik mempermudah verifikasi manual oleh Admin.
+    <!-- Steps -->
+    <div class="pay-steps">
+      <div class="pay-step">
+        <span class="pay-step-num">1</span>
+        <span>Transfer sesuai nominal di atas ke rekening/dompet.</span>
+      </div>
+      <div class="pay-step">
+        <span class="pay-step-num">2</span>
+        <span>Screenshot bukti transfer → WA ke
+          <a href="https://wa.me/6285839053130" target="_blank" style="color:var(--gold);">085839053130</a>
+          format: <strong>SALC – [nama] – [plan]</strong>
+        </span>
+      </div>
+      <div class="pay-step">
+        <span class="pay-step-num">3</span>
+        <span>Plan aktif dalam 1×24 jam. SALC EXPERT ADVISOR siap! ⚡</span>
+      </div>
     </div>
 
     <!-- WA Confirm Button -->
-    <button class="btn btn-wa" onclick="doWhatsAppTransfer()">
-      💬 SAYA SUDAH TRANSFER — KONFIRMASI VIA WA
-    </button>
-    <button class="btn btn-ghost" onclick="closePayModal()" style="margin-top:8px;">
-      BATAL
-    </button>
-
+    <a href="https://wa.me/6285839053130?text=Halo+Admin+SALC%2C+saya+sudah+transfer+untuk+upgrade+plan.+Nama%3A+"
+       target="_blank" rel="noopener noreferrer" class="btn btn-wa">
+      💬 KONFIRMASI VIA WHATSAPP
+    </a>
+    <button class="btn btn-ghost" onclick="closePayModal()" style="margin-top:8px;">BATAL</button>
   </div>
-</div><!-- /#payModal -->
-
-
-<!-- =====================================================================
-     MODAL: SETTINGS
-====================================================================== -->
-<div
-  class="modal-overlay settings-modal-overlay"
-  id="settingsModal"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Settings"
-  hidden
->
-  <div class="modal-sheet settings-sheet">
-    <div class="modal-handle" aria-hidden="true"></div>
-    <h3 class="settings-title">PENGATURAN</h3>
-    <p class="settings-sub">SHELEN v13 — PERSONALISASI</p>
-
-    <!-- Tampilan -->
-    <div class="settings-section">
-      <div class="settings-section-title">TAMPILAN</div>
-      <div class="settings-row">
-        <span class="settings-label">Accent Color</span>
-        <input type="color" class="color-picker" value="#f0b44a" oninput="changeAccentColor(this.value)" aria-label="Accent color" />
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">CRT Scanlines</span>
-        <div class="toggle-wrap">
-          <button class="toggle" id="scanToggleSettings" role="switch" aria-checked="false" onclick="toggleScanlines()" aria-label="CRT scanlines"></button>
-          <span class="toggle-label" id="scanLabelSettings">OFF</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notifikasi -->
-    <div class="settings-section">
-      <div class="settings-section-title">NOTIFIKASI &amp; AUDIO</div>
-      <div class="settings-row">
-        <span class="settings-label">Voice Alert (Signal)</span>
-        <div class="toggle-wrap">
-          <button class="toggle toggle--on" id="voiceAlertToggle" role="switch" aria-checked="true" onclick="toggleVoiceAlert()" aria-label="Voice alert"></button>
-          <span class="toggle-label" id="voiceAlertLabel">ON</span>
-        </div>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Killzone Clock</span>
-        <div class="toggle-wrap">
-          <button class="toggle toggle--on" id="kzToggle" role="switch" aria-checked="true" onclick="toggleKZWidget()" aria-label="Killzone clock"></button>
-          <span class="toggle-label" id="kzToggleLabel">ON</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Akun Info -->
-    <div class="settings-section">
-      <div class="settings-section-title">AKUN &amp; PLAN</div>
-      <div class="settings-row"><span class="settings-label">Status Akun</span><span class="settings-value" id="settAccName">GUEST</span></div>
-      <div class="settings-row"><span class="settings-label">Plan Aktif</span><span class="settings-value" id="settPlanStatus">FREE</span></div>
-      <div class="settings-row"><span class="settings-label">Signal Hari Ini</span><span class="settings-value" id="settSigCount">0 / 5</span></div>
-    </div>
-
-    <!-- MT5 Bridge -->
-    <div class="settings-section">
-      <div class="settings-section-title">MT5 BRIDGE</div>
-      <div class="settings-row"><span class="settings-label">Status</span><span class="settings-value" id="settMT5Status">DISCONNECTED</span></div>
-      <div class="settings-row"><span class="settings-label">URL</span><span class="settings-value settings-value--mono" id="settMT5URL">ws://localhost:8080</span></div>
-      <button class="btn btn-ghost btn-sm" onclick="closeSett(); openMT5Modal();" style="margin-top:6px;">⚙ BUKA MT5 SETUP</button>
-    </div>
-
-    <!-- About -->
-    <div class="settings-section">
-      <div class="settings-section-title">TENTANG SHELEN</div>
-      <div class="settings-row"><span class="settings-label">Versi Terminal</span><span class="settings-value">SHELEN v13</span></div>
-      <div class="settings-row"><span class="settings-label">AI Engine</span><span class="settings-value">ALCHEMIST v8</span></div>
-      <div class="settings-row"><span class="settings-label">Data Source</span><span class="settings-value">MT5 Bridge WSS</span></div>
-      <div class="settings-row"><span class="settings-label">Founder</span><span class="settings-value">Nizar Nurkhalik</span></div>
-      <div class="settings-row"><span class="settings-label">Kontak Admin</span><span class="settings-value">wa.me/6285839053130</span></div>
-    </div>
-
-    <button class="btn btn-ghost" onclick="closeSettingsModal()">TUTUP PENGATURAN</button>
-  </div>
-</div><!-- /#settingsModal -->
+</div>
 
 
 <!-- =====================================================================
      MODAL: TERMS OF SERVICE
 ====================================================================== -->
-<div
-  class="modal-overlay tos-modal-overlay"
-  id="tosModal"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Terms of Service"
-  hidden
->
+<div class="modal-overlay tos-modal-overlay" id="tosModal"
+     role="dialog" aria-modal="true" aria-label="Terms of Service" hidden>
   <div class="modal-sheet tos-sheet">
     <div class="modal-handle" aria-hidden="true"></div>
     <h3 class="tos-title">SYARAT &amp; KETENTUAN</h3>
-
     <div class="tos-body">
       <h4>1. DEFINISI</h4>
-      <p>SHELEN adalah platform terminal trading berbasis AI yang menyediakan sinyal, analisa, dan alat bantu trading. Pengguna adalah individu yang mendaftar dan menggunakan layanan SHELEN.</p>
-
+      <p>SALC Expert Advisor Terminal adalah platform terminal trading berbasis AI yang menyediakan sinyal, analisa, dan alat bantu trading. Pengguna adalah individu yang mendaftar dan menggunakan layanan SALC.</p>
       <h4>2. RISIKO TRADING</h4>
-      <p>Trading forex, komoditas, dan aset keuangan mengandung risiko kerugian yang signifikan termasuk kemungkinan kehilangan seluruh modal. SHELEN <strong>tidak memberikan jaminan profit</strong>. Semua sinyal dan analisa bersifat informatif dan bukan rekomendasi investasi. Pengguna bertanggung jawab penuh atas keputusan trading mereka.</p>
-
+      <p>Trading forex, komoditas, dan aset keuangan mengandung risiko kerugian yang signifikan termasuk kemungkinan kehilangan seluruh modal. SALC <strong>tidak memberikan jaminan profit</strong>. Semua sinyal dan analisa bersifat informatif dan bukan rekomendasi investasi. Pengguna bertanggung jawab penuh atas keputusan trading mereka.</p>
       <h4>3. PENGGUNAAN PLATFORM</h4>
-      <p>Pengguna dilarang menggunakan platform untuk aktivitas ilegal. Akun tidak dapat dipindahtangankan. SHELEN berhak menangguhkan akun yang melanggar ketentuan tanpa pemberitahuan sebelumnya.</p>
-
+      <p>Pengguna dilarang menggunakan platform untuk aktivitas ilegal. Akun tidak dapat dipindahtangankan. SALC berhak menangguhkan akun yang melanggar ketentuan tanpa pemberitahuan sebelumnya.</p>
       <h4>4. PEMBAYARAN &amp; REFUND</h4>
-      <p>Pembayaran plan dilakukan via transfer bank atau QRIS. Tidak ada pengembalian dana (refund) setelah plan diaktifkan, kecuali terdapat kesalahan teknis yang terbukti dari pihak SHELEN.</p>
-
+      <p>Pembayaran plan dilakukan via transfer bank atau e-wallet. Tidak ada pengembalian dana setelah plan diaktifkan, kecuali terdapat kesalahan teknis yang terbukti dari pihak SALC.</p>
       <h4>5. PRIVASI DATA</h4>
-      <p>Data pengguna (akun, trade journal, preferensi) disimpan secara lokal di perangkat pengguna (localStorage). SHELEN tidak mengirimkan data pribadi ke server pihak ketiga tanpa persetujuan eksplisit pengguna.</p>
-
-      <h4>6. MT5 BRIDGE</h4>
-      <p>Koneksi MT5 Bridge bersifat peer-to-peer antara aplikasi SHELEN dan EA di MetaTrader 5 pengguna. SHELEN tidak menyimpan atau mengakses data akun MT5 pengguna. Keamanan koneksi sepenuhnya menjadi tanggung jawab pengguna.</p>
-
-      <h4>7. PERUBAHAN KETENTUAN</h4>
-      <p>SHELEN berhak mengubah ketentuan ini sewaktu-waktu. Penggunaan berkelanjutan dianggap sebagai persetujuan terhadap perubahan tersebut.</p>
-
+      <p>Data pengguna (akun, trade journal, preferensi) disimpan secara lokal di perangkat pengguna (localStorage). SALC tidak mengirimkan data pribadi ke server pihak ketiga tanpa persetujuan eksplisit.</p>
+      <h4>6. DATA FEED &amp; MT5 BRIDGE</h4>
+      <p>Koneksi data feed (Binance WSS, TwelveData, MT5 Bridge) bersifat real-time. SALC tidak menyimpan atau mengakses data akun MT5 pengguna. Keamanan koneksi sepenuhnya menjadi tanggung jawab pengguna.</p>
+      <h4>7. FOUNDER GODMODE</h4>
+      <p>Akses Founder GodMode diberikan secara eksklusif kepada Nizar Nurkhalik (Founder SALC) melalui URL parameter khusus dan tidak dapat dipindahtangankan.</p>
       <h4>8. KONTAK</h4>
-      <p>Pertanyaan dan dukungan: <a href="https://wa.me/6285839053130" target="_blank" rel="noopener noreferrer">wa.me/6285839053130</a> (Nizar Nurkhalik — Founder SHELEN)</p>
+      <p>Pertanyaan: <a href="https://wa.me/6285839053130" target="_blank" rel="noopener noreferrer">wa.me/6285839053130</a> (Nizar Nurkhalik — Founder SALC)</p>
     </div>
-
     <button class="btn btn-gold" onclick="closeTosModal()">TUTUP &amp; SETUJU</button>
   </div>
-</div><!-- /#tosModal -->
+</div>
 
 
 <!-- =====================================================================
      GLOBAL TOAST NOTIFICATION
 ====================================================================== -->
-<div
-  class="toast"
-  id="toast"
-  role="status"
-  aria-live="polite"
-  aria-atomic="true"
-></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 
 <!-- =====================================================================
